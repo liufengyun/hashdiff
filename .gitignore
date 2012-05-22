@@ -6,6 +6,8 @@
 
 # Ignore bundler config
 /.bundle
+/doc
+/.yardoc
 
 *.swp
 *.bak
