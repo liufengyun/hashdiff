@@ -2,7 +2,7 @@ $LOAD_PATH << File.expand_path("../lib", __FILE__)
 require 'hash_diff/version'
 
 Gem::Specification.new do |s|
-  s.name        = %q{HashDiff}
+  s.name        = %q{hashdiff}
   s.version     = HashDiff::VERSION
   s.summary     = %q{ HashDiff is a diff lib to compute the smallest difference between two hashes. }
   s.description = %q{ HashDiff is a diff lib to compute the smallest difference between two hashes. }
