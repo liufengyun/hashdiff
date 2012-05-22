@@ -1,7 +1,7 @@
 HashDiff
 =========
 
-HashDiff is a ruby library to to compute the smallest difference between two hashes.
+HashDiff is a ruby library to compute the smallest difference between two hashes.
 
 Requirements
 ------------
