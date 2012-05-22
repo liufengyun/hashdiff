@@ -109,11 +109,6 @@ describe HashDiff do
     diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   end
 
-  it "should be able to decode property path" do
-    decoded = HashDiff.send(:decode_property_path, "a.b[0].c.city[5]")
-    decoded.should == ['a', 'b', 0, 'c', 'city', 5]
-  end
-
   it "should be able to diff similar objects in array" do
     a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, 3]
     b = [1, {'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}]

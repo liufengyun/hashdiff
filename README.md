@@ -41,7 +41,7 @@ Array in hash:
     a = {a:[{x:2, y:3, z:4}, {x:11, y:22, z:33}], b:{x:3, z:45}}
     b = {a:[{y:3}, {x:11, z:33}], b:{y:22}}
 
-    diff = HashDiff.diff(a, b)
+    diff = HashDiff.best_diff(a, b) # best_diff will try to match similar objects in array in order to generate the smallest change set
     diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 22]]
 
 ### Patch
