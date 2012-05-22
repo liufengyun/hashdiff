@@ -28,8 +28,8 @@ describe HashDiff do
   end
 
   it "should be able to diff changes in hash value which is hash" do
-    diff = HashDiff.diff({a:{x:2, y:3, z:4}, b:{x:3, z:45}}, {a:{y:3}, b:{y:3}})
-    diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 3]]
+    diff = HashDiff.diff({a:{x:2, y:3, z:4}, b:{x:3, z:45}}, {a:{y:3}, b:{y:3, z:30}})
+    diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]
   end
 
   it "should be able to diff similar objects in array" do
