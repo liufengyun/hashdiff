@@ -3,8 +3,6 @@ HashDiff
 
 HashDiff is a ruby library to to compute the smallest difference between two hashes.
 
-The complete [RDoc](http://rdoc.info/gems/hashdiff) is online.
-
 Requirements
 ------------
 HashDiff is tested on following platforms:
@@ -24,7 +22,7 @@ HashDiff is distributed as a gem, which is how it should be used in your app.
 
 Include the gem in your Gemfile:
 
-    gem "paperclip"
+    gem "hashdiff"
 
 Or, if you want to get the latest, you can get master from the main HashDiff repository:
 
@@ -35,7 +33,48 @@ Quick Start
 
 ### Diff
 
+Two simple hash:
+
+    a = {a:3, b:2}
+    b = {}
+
+    diff = HashDiff.diff(a, b)
+    diff.should == [['-', 'a', 3], ['-', 'b', 2]]
+
+More complex hash:
+
+    a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
+    b = {a:{y:3}, b:{y:3}}
+
+    diff = HashDiff.diff(a, b)
+    diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 3]]
+
+Array in hash:
+
+    a = {a:[{x:2, y:3, z:4}, {x:11, y:22, z:33}], b:{x:3, z:45}}
+    b = {a:[{y:3}, {x:11, z:33}], b:{y:22}}
+
+    diff = HashDiff.diff(a, b)
+    diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 22]]
+
 ### Patch
+
+patch example:
+
+    a = {a: 3}
+    b = {a: {a1: 1, a2: 2}}
+
+    diff = HashDiff.diff(a, b)
+    HashDiff.patch(a, diff).should == b
+
+unpatch example:
+
+    a = [{a: 1, b: 2, c: 3, d: 4, e: 5}, {x: 5, y: 6, z: 3}, 1]
+    b = [1, {a: 1, b: 2, c: 3, e: 5}]
+
+    diff = HashDiff.diff(a, b) # diff two array is OK
+    HashDiff.unpatch(b, diff).should == a
+
 
 License
 -------
