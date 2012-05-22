@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    HashDiff (0.0.1)
+    hashdiff (0.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -22,7 +22,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  HashDiff!
   bluecloth
+  hashdiff!
   rspec (~> 2.0)
   yard
