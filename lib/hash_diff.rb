@@ -1,0 +1,5 @@
+require 'hash_diff/util'
+require 'hash_diff/lcs'
+require 'hash_diff/diff'
+require 'hash_diff/patch'
+require 'hash_diff/version'
