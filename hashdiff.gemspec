@@ -1,5 +1,5 @@
 $LOAD_PATH << File.expand_path("../lib", __FILE__)
-require 'hash_diff/version'
+require 'hashdiff/version'
 
 Gem::Specification.new do |s|
   s.name        = %q{hashdiff}
