@@ -15,19 +15,6 @@ HashDiff is tested on following platforms:
 - jruby
 - ruby-head
 
-Installation
-------------
-
-HashDiff is distributed as a gem, which is how it should be used in your app.
-
-Include the gem in your Gemfile:
-
-    gem "hashdiff"
-
-Or, if you want to get the latest, you can get master from the main HashDiff repository:
-
-    gem "hashdiff", :git => "git://github.com/liufengyun/hashdiff.git"
-
 Quick Start
 -----------
 
@@ -44,10 +31,10 @@ Two simple hash:
 More complex hash:
 
     a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
-    b = {a:{y:3}, b:{y:3}}
+    b = {a:{y:3}, b:{y:3, z:30}}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 3]]
+    diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]
 
 Array in hash:
 
