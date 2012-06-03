@@ -59,7 +59,7 @@ patch example:
     b = {a: {a1: 1, a2: 2}}
 
     diff = HashDiff.diff(a, b)
-    HashDiff.patch(a, diff).should == b
+    HashDiff.patch!(a, diff).should == b
 
 unpatch example:
 
@@ -67,7 +67,7 @@ unpatch example:
     b = [1, {a: 1, b: 2, c: 3, e: 5}]
 
     diff = HashDiff.diff(a, b) # diff two array is OK
-    HashDiff.unpatch(b, diff).should == a
+    HashDiff.unpatch!(b, diff).should == a
 
 
 License
