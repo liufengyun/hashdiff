@@ -1,5 +1,6 @@
 module HashDiff
-
+  # @private
+  #
   # caculate array difference using LCS algorithm
   # http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
   def self.lcs(a, b, similarity = 0.8)

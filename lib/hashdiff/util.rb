@@ -1,5 +1,7 @@
 module HashDiff
 
+  # @private
+  #
   # return an array of added properties
   # e.g. [[ '+', 'a.b', 45 ], [ '-', 'a.c', 5 ]]
   def self.changed(obj, sign, prefix = "")
@@ -35,6 +37,8 @@ module HashDiff
     results
   end
 
+  # @private
+  #
   # judge whether two objects are similar
   def self.similiar?(a, b, similarity = 0.8)
     count_a = count_nodes(a)
@@ -48,6 +52,8 @@ module HashDiff
     end
   end
 
+  # @private
+  #
   # count total nodes for an object
   def self.count_nodes(obj)
     return 0 unless obj
@@ -66,6 +72,8 @@ module HashDiff
     count
   end
 
+  # @private
+  #
   # decode property path into an array
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
@@ -85,6 +93,8 @@ module HashDiff
     parts.flatten
   end
 
+  # @private
+  #
   # get the node of hash by given path parts
   def self.node(hash, parts)
     temp = hash

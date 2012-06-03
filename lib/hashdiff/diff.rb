@@ -1,6 +1,22 @@
 module HashDiff
 
-  # try to make the best diff that generates the smallest change set
+  # Best diff two objects, which tries to generate the smallest change set.
+  #
+  # HashDiff.best_diff is only meaningful in case of comparing two objects which includes similar objects in array.
+  #
+  # @param [Arrary, Hash] obj1
+  # @param [Arrary, Hash] obj2
+  #
+  # @return [Array] an array of changes.
+  #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  #
+  # @example
+  #   a = {'x' => [{'a' => 1, 'c' => 3, 'e' => 5}, {'y' => 3}]}
+  #   b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
+  #   diff = HashDiff.best_diff(a, b)
+  #   diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
+  #
+  # @since 0.0.1
   def self.best_diff(obj1, obj2)
     diffs_1 = diff(obj1, obj2, "", 0.3)
     diffs_2 = diff(obj1, obj2, "", 0.5)
@@ -10,11 +26,25 @@ module HashDiff
     diffs = diffs.size < diffs_3.size ? diffs : diffs_3
   end
 
-  # compute the diff of two hashes, return an array of changes
-  # e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  # Compute the diff of two hashes
   #
-  # NOTE: diff will treat nil as [], {} or "" in comparison according to different context.
-  # 
+  # @param [Arrary, Hash] obj1
+  # @param [Arrary, Hash] obj2
+  # @param [float] similarity A value > 0 and <= 1.
+  #   This parameter should be ignored in common usage.
+  #   Similarity is only meaningful if there're similar objects in arrays. See {best_diff}.
+  #
+  # @return [Array] an array of changes.
+  #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  #
+  # @example
+  #   a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
+  #   b = {"a" => 1, "b" => {}}
+  #
+  #   diff = HashDiff.diff(a, b)
+  #   diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
+  #
+  # @since 0.0.1
   def self.diff(obj1, obj2, prefix = "", similarity = 0.8)
     if obj1.nil? and obj2.nil?
       return []
@@ -82,6 +112,8 @@ module HashDiff
     result
   end
 
+  # @private
+  #
   # diff array using LCS algorithm
   def self.diff_array(a, b, similarity = 0.8)
     change_set = []

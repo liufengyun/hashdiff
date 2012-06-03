@@ -9,14 +9,27 @@ HashDiff is tested on following platforms:
 
 - 1.8.7
 - 1.9.2
+- 1.9.3
 - rbx
 - rbx-2.0
 - ree
 - jruby
 - ruby-head
 
+Usage
+------------
+If you're using bundler, add following:
+
+    gem 'hashdiff'
+
+Or, you can run `gem install hashdiff`, then add following line to your ruby file which uses HashDiff:
+
+    require 'hashdiff'
+
 Quick Start
 -----------
+
+You can find full docs here: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 ### Diff
 
@@ -41,7 +54,7 @@ Array in hash:
     a = {a:[{x:2, y:3, z:4}, {x:11, y:22, z:33}], b:{x:3, z:45}}
     b = {a:[{y:3}, {x:11, z:33}], b:{y:22}}
 
-    diff = HashDiff.best_diff(a, b) # best_diff will try to match similar objects in array in order to generate the smallest change set
+    diff = HashDiff.best_diff(a, b)
     diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 22]]
 
 ### Patch
