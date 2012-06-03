@@ -16,24 +16,16 @@ module HashDiff
   # NOTE: diff will treat nil as [], {} or "" in comparison according to different context.
   # 
   def self.diff(obj1, obj2, prefix = "", similarity = 0.8)
+    if obj1.nil? and obj2.nil?
+      return []
+    end
+
     if obj1.nil?
-      if obj2.is_a?(Array)
-        return diff([], obj2, prefix, similarity)
-      elsif obj2.is_a?(Hash)
-        return diff({}, obj2, prefix, similarity)
-      else
-        return diff('', obj2, prefix, similarity)
-      end
+      return [['-', prefix, nil]] + changed(obj2, '+', prefix)
     end
 
     if obj2.nil?
-      if obj1.is_a?(Array)
-        return diff(obj1, [], prefix, similarity)
-      elsif obj1.is_a?(Hash)
-        return diff(obj1, {}, prefix, similarity)
-      else
-        return diff(obj1, '', prefix, similarity)
-      end
+      return changed(obj1, '-', prefix) + [['+', prefix, nil]]
     end
 
     if !(obj1.is_a?(Array) and obj2.is_a?(Array)) and !(obj1.is_a?(Hash) and obj2.is_a?(Hash)) and !(obj1.is_a?(obj2.class) or obj2.is_a?(obj1.class))

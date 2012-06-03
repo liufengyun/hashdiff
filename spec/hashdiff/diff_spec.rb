@@ -67,13 +67,12 @@ describe HashDiff do
     diff.should == [['-', 'b[1]', 2], ['-', 'b[0]', 1]]
   end
 
-  # treat nil as empty array
   it "should be able to diff value changes: array <=> nil" do
     a = {"a" => 1, "b" => [1, 2]}
     b = {"a" => 1, "b" => nil}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b[1]', 2], ['-', 'b[0]', 1]]
+    diff.should == [['-', 'b[1]', 2], ['-', 'b[0]', 1], ['-', 'b', []], ['+', 'b', nil]]
   end
 
   it "should be able to diff value chagnes: remove array completely" do
@@ -100,13 +99,12 @@ describe HashDiff do
     diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   end
 
-  # treat nil as empty hash
   it "should be able to diff value changes: hash <=> nil" do
     a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
     b = {"a" => 1, "b" => nil}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
+    diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2], ['-', 'b', {}], ['+', 'b', nil]]
   end
 
   it "should be able to diff similar objects in array" do

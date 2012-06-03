@@ -42,8 +42,7 @@ describe HashDiff do
     b = {"a" => 1, "b" => nil}
     diff = HashDiff.diff(a, b)
 
-    # NOTE: nil is treated as [] in this context
-    HashDiff.patch(a, diff).should == {"a" => 1, "b" => []}
+    HashDiff.patch(a, diff).should == b
 
     a = {"a" => 1, "b" => [1, 2]}
     b = {"a" => 1, "b" => nil}
@@ -91,8 +90,7 @@ describe HashDiff do
     b = {"a" => 1, "b" => nil}
     diff = HashDiff.diff(a, b)
 
-    # NOTE: nil will be taken as {} in the context
-    HashDiff.patch(a, diff).should == {"a" => 1, "b" => {}}
+    HashDiff.patch(a, diff).should == b
 
     a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
     b = {"a" => 1, "b" => nil}
