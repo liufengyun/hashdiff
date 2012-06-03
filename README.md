@@ -9,16 +9,7 @@ HashDiff is a ruby library to compute the smallest difference between two hashes
 
 Requirements
 ------------
-HashDiff is tested on following platforms:
-
-- 1.8.7
-- 1.9.2
-- 1.9.3
-- rbx
-- rbx-2.0
-- ree
-- jruby
-- ruby-head
+HashDiff is tested against `1.8.7`, `1.9.2`, `1.9.3`, `rbx`, `rbx-2.0`, `ree`, `jruby`, `ruby-head`
 
 Usage
 ------------
