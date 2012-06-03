@@ -1,15 +1,17 @@
 HashDiff
 =========
 
+[![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.png)](http://travis-ci.org/liufengyun/hashdiff)
+
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
 **Demo**: [HashDiff](http://hashdiff.herokuapp.com/)
 
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
-Requirements
+Compatibility
 ------------
-HashDiff is tested against `1.8.7`, `1.9.2`, `1.9.3`, `rbx`, `rbx-2.0`, `ree`, `jruby`, `ruby-head`
+HashDiff is tested against `1.9.2`, `1.9.3` and `ruby-head`. It should work on other versions as well.
 
 Usage
 ------------
