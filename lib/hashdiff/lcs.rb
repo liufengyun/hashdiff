@@ -15,7 +15,7 @@ module HashDiff
     (0..b_finish).each do |bi|
       lcs[bi] = [] 
       (0..a_finish).each do |ai|
-        if similiar?(a[ai], b[bi], similarity)
+        if similar?(a[ai], b[bi], similarity)
           topleft = (ai > 0 and bi > 0)? lcs[bi-1][ai-1][1] : 0
           lcs[bi][ai] = [:topleft, topleft + 1]
         elsif

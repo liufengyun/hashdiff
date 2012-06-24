@@ -1,6 +1,6 @@
 module HashDiff
 
-  # Best diff two objects, which tries to generate the smallest change set.
+  # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #
   # HashDiff.best_diff is only meaningful in case of comparing two objects which includes similar objects in array.
   #
@@ -19,11 +19,16 @@ module HashDiff
   # @since 0.0.1
   def self.best_diff(obj1, obj2)
     diffs_1 = diff(obj1, obj2, "", 0.3)
-    diffs_2 = diff(obj1, obj2, "", 0.5)
-    diffs_3 = diff(obj1, obj2, "", 0.8)
+    count_1 = count_diff diffs_1
 
-    diffs = diffs_1.size < diffs_2.size ? diffs_1 : diffs_2
-    diffs = diffs.size < diffs_3.size ? diffs : diffs_3
+    diffs_2 = diff(obj1, obj2, "", 0.5)
+    count_2 = count_diff diffs_2
+
+    diffs_3 = diff(obj1, obj2, "", 0.8)
+    count_3 = count_diff diffs_3
+
+    count, diffs = count_1 < count_2 ? [count_1, diffs_1] : [count_2, diffs_2]
+    diffs = count < count_3 ? diffs : diffs_3
   end
 
   # Compute the diff of two hashes
@@ -51,15 +56,15 @@ module HashDiff
     end
 
     if obj1.nil?
-      return [['-', prefix, nil]] + changed(obj2, '+', prefix)
+      return [['~', prefix, nil, obj2]]
     end
 
     if obj2.nil?
-      return changed(obj1, '-', prefix) + [['+', prefix, nil]]
+      return [['~', prefix, obj1, nil]]
     end
 
     if !(obj1.is_a?(Array) and obj2.is_a?(Array)) and !(obj1.is_a?(Hash) and obj2.is_a?(Hash)) and !(obj1.is_a?(obj2.class) or obj2.is_a?(obj1.class))
-      return changed(obj1, '-', prefix) + changed(obj2, '+', prefix)
+      return [['~', prefix, obj1, obj2]]
     end
 
     result = []
@@ -73,9 +78,9 @@ module HashDiff
 
       changeset.each do |change|
         if change[0] == '-'
-          result.concat(changed(change[2], '-', "#{prefix}[#{change[1]}]"))
+          result << ['-', "#{prefix}[#{change[1]}]", change[2]]
         elsif change[0] == '+'
-          result.concat(changed(change[2], '+', "#{prefix}[#{change[1]}]"))
+          result << ['+', "#{prefix}[#{change[1]}]", change[2]]
         end
       end
     elsif obj1.is_a?(Hash)
@@ -93,7 +98,7 @@ module HashDiff
       end
 
       # add deleted properties
-      deleted_keys.each {|k| result.concat(changed(obj1[k], '-', "#{prefix}#{k}")) }
+      deleted_keys.each {|k| result << ['-', "#{prefix}#{k}", obj1[k]] }
 
       # recursive comparison for common keys
       common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], "#{prefix}#{k}", similarity)) }
@@ -101,7 +106,7 @@ module HashDiff
       # added properties
       obj2.each do |k, v|
         unless obj1.key?(k)
-          result.concat(changed(obj2[k], '+', "#{prefix}#{k}"))
+          result << ['+', "#{prefix}#{k}", obj2[k]]
         end
       end
     else

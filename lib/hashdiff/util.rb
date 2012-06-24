@@ -2,53 +2,27 @@ module HashDiff
 
   # @private
   #
-  # return an array of added properties
-  # e.g. [[ '+', 'a.b', 45 ], [ '-', 'a.c', 5 ]]
-  def self.changed(obj, sign, prefix = "")
-    return [[sign, prefix, obj]] unless obj
-
-    results = []
-    if obj.is_a?(Array)
-      if sign == '+'
-        # add from the begining
-        results << [sign, prefix, []]
-        obj.each_index do |index|
-          results.concat(changed(obj[index], sign, "#{prefix}[#{index}]"))
-        end
-      elsif sign == '-'
-        # delete from the end
-        obj.each_index do |index|
-          i = obj.size - index - 1
-          results.concat(changed(obj[i], sign, "#{prefix}[#{i}]"))
-        end
-        results << [sign, prefix, []]
-      end
-    elsif obj.is_a?(Hash)
-      results << [sign, prefix, {}] if sign == '+'
-      prefix_t = prefix.empty? ? "" : "#{prefix}."
-      obj.each do |k, v|
-        results.concat(changed(v, sign, "#{prefix_t}#{k}"))
-      end
-      results << [sign, prefix, {}] if sign == '-'
-    else
-      return [[sign, prefix, obj]]
-    end
-
-    results
-  end
-
-  # @private
-  #
   # judge whether two objects are similar
-  def self.similiar?(a, b, similarity = 0.8)
+  def self.similar?(a, b, similarity = 0.8)
     count_a = count_nodes(a)
     count_b = count_nodes(b)
-    count_diff = diff(a, b, "", similarity).count
+    diffs = count_diff diff(a, b, "", similarity)
 
     if count_a + count_b == 0
       return true
     else
-      (1 - count_diff.to_f/(count_a + count_b).to_f) >= similarity
+      (1 - diffs.to_f/(count_a + count_b).to_f) >= similarity
+    end
+  end
+
+  # @private
+  #
+  # count node differences
+  def self.count_diff(diffs)
+    diffs.inject(0) do |sum, item|
+      old_change_count = count_nodes(item[2])
+      new_change_count = count_nodes(item[3])
+      sum += (old_change_count > new_change_count ? old_change_count : new_change_count)
     end
   end
 
@@ -60,10 +34,8 @@ module HashDiff
 
     count = 0
     if obj.is_a?(Array)
-      count = obj.size
       obj.each {|e| count += count_nodes(e) }
     elsif obj.is_a?(Hash)
-      count = obj.size
       obj.each {|k, v| count += count_nodes(v) }
     else
       return 1

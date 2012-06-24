@@ -1,5 +1,4 @@
-HashDiff
-=========
+# HashDiff
 
 [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.png)](http://travis-ci.org/liufengyun/hashdiff)
 
@@ -9,12 +8,30 @@ HashDiff is a ruby library to compute the smallest difference between two hashes
 
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
-Compatibility
-------------
+## Why HashDiff?
+
+Given two Hashes A and B, sometimes you face the question: what's the smallest changes that can be made to change A to B?
+
+An algorithm responds to this question has to do following:
+
+* Generate a list of additions, deletions and changes, so that `A + ChangeSet = B` and `B - ChangeSet = A`.
+* Compute recursively -- Arrays and Hashes may be nested arbitrarily in A or B.
+* Compute the smallest change -- it should recoganize similar child Hashes or child Arrays between A and B.
+
+HashDiff answers the question above in an opinionated approach:
+
+* Hash can be represented as a list of (dot-syntax-path, value) pairs. For example, `{a:[{c:2}]}` can be represented as `["a[0].c", 2]`.
+* The change set can be represented using the do-syntax representation. For example, `[['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]`.
+* It compares Arrays using LCS(longest common subsequence) algorithm.
+* It recoganize similar Hashes in Array using a similarity value(0 < similarity <= 1).
+
+
+## Compatibility
+
 HashDiff is tested against `1.9.2`, `1.9.3` and `ruby-head`. It should work on other versions as well.
 
-Usage
-------------
+## Usage
+
 If you're using bundler, add following to the Gemfile:
 
     gem 'hashdiff'
@@ -23,9 +40,7 @@ Or, you can run `gem install hashdiff`, then add following line to your ruby fil
 
     require 'hashdiff'
 
-Quick Start
------------
-
+## Quick Start
 
 ### Diff
 
@@ -72,8 +87,7 @@ unpatch example:
     HashDiff.unpatch!(b, diff).should == a
 
 
-License
--------
+## License
 
 HashDiff is distributed under the MIT-LICENSE.
 

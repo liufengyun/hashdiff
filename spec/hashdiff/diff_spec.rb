@@ -53,10 +53,10 @@ describe HashDiff do
     b = {"a" => {"a1" => 1, "a2" => 2}}
 
     diff = HashDiff.diff(a, b)
-    diff.should  == [['-', 'a', 3], ['+', 'a', {}], ['+', 'a.a1', 1], ['+', 'a.a2', 2]]
+    diff.should  == [['~', 'a', 3, {"a1" => 1, "a2" => 2}]]
 
     diff = HashDiff.diff(b, a)
-    diff.should  == [['-', 'a.a1', 1], ['-', 'a.a2', 2], ['-', 'a', {}], ['+', 'a', 3]]
+    diff.should  == [['~', 'a', {"a1" => 1, "a2" => 2}, 3]]
   end
 
   it "should be able to diff value changes: array <=> []" do
@@ -72,7 +72,7 @@ describe HashDiff do
     b = {"a" => 1, "b" => nil}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b[1]', 2], ['-', 'b[0]', 1], ['-', 'b', []], ['+', 'b', nil]]
+    diff.should == [["~", "b", [1, 2], nil]]
   end
 
   it "should be able to diff value chagnes: remove array completely" do
@@ -80,7 +80,7 @@ describe HashDiff do
     b = {"a" => 1}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b[1]', 2], ['-', 'b[0]', 1], ['-', 'b', []]]
+    diff.should == [["-", "b", [1, 2]]]
   end
 
   it "should be able to diff value changes: remove whole hash" do
@@ -88,7 +88,7 @@ describe HashDiff do
     b = {"a" => 1}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2], ['-', 'b', {}]]
+    diff.should == [["-", "b", {"b1"=>1, "b2"=>2}]]
   end
 
   it "should be able to diff value changes: hash <=> {}" do
@@ -104,7 +104,7 @@ describe HashDiff do
     b = {"a" => 1, "b" => nil}
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2], ['-', 'b', {}], ['+', 'b', nil]]
+    diff.should == [["~", "b", {"b1"=>1, "b2"=>2}, nil]]
   end
 
   it "should be able to diff similar objects in array" do
@@ -120,7 +120,7 @@ describe HashDiff do
     b = [{'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}, 3]
 
     diff = HashDiff.diff(a, b)
-    diff.should == [['-', '[0].d', 4], ['-', '[1].x', 5], ['-', '[1].y', 6], ['-', '[1].z', 3], ['-', '[1]', {}]]
+    diff.should == [["-", "[0].d", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
   it "should be able to best diff" do
@@ -128,7 +128,7 @@ describe HashDiff do
     b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
 
     diff = HashDiff.best_diff(a, b)
-    diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
+    diff.should == [["-", "x[0].c", 3], ["+", "x[0].b", 2], ["-", "x[1]", {"y"=>3}]]
   end
 
 end
