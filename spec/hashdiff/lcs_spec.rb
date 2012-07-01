@@ -32,5 +32,20 @@ describe HashDiff do
     lcs = HashDiff.lcs(a, b)
     lcs.should == [[1, 1], [3, 2]]
   end
+
+  it "should be able to find LCS with a similarity value" do
+    a = [
+          {"value" => "New", "onclick" => "CreateNewDoc()"},
+          {"value" => "Close", "onclick" => "CloseDoc()"}
+        ]
+    b = [
+          {"value" => "New1", "onclick" => "CreateNewDoc()"},
+          {"value" => "Open", "onclick" => "OpenDoc()"},
+          {"value" => "Close", "onclick" => "CloseDoc()"}
+        ]
+
+    lcs = HashDiff.lcs(a, b, 0.5)
+    lcs.should == [[0, 0], [1, 2]]
+  end
 end
 

@@ -22,7 +22,7 @@ module HashDiff
     diffs.inject(0) do |sum, item|
       old_change_count = count_nodes(item[2])
       new_change_count = count_nodes(item[3])
-      sum += (old_change_count > new_change_count ? old_change_count : new_change_count)
+      sum += (old_change_count + new_change_count)
     end
   end
 
