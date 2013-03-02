@@ -9,6 +9,15 @@ describe HashDiff do
     diff.should == [["-", "x[0].c", 3], ["+", "x[0].b", 2], ["-", "x[1]", {"y"=>3}]]
   end
 
+  it "should use custom delimiter when provided" do
+    a = {'x' => [{'a' => 1, 'c' => 3, 'e' => 5}, {'y' => 3}]}
+    b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
+
+    diff = HashDiff.best_diff(a, b, "\t")
+    diff.should == [["-", "x[0]\tc", 3], ["+", "x[0]\tb", 2], ["-", "x[1]", {"y"=>3}]]
+  end
+
+
   it "should be able to best diff array in hash" do
     a = {"menu" => {
       "id" => "file",
