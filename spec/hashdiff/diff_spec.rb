@@ -123,5 +123,13 @@ describe HashDiff do
     diff.should == [["-", "[0].d", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
+  it "should use custom delimiter when provided" do
+    a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 3]
+    b = [{'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}, 3]
+
+    diff = HashDiff.diff(a, b, "", 0.8, "\t")
+    diff.should == [["-", "[0]\td", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
+  end
+
 end
 

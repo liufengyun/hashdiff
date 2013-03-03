@@ -7,13 +7,14 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be patchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  # @param [String] delimiter Property-string delimiter
   #
   # @return the object after patch
   #
   # @since 0.0.1
-  def self.patch!(obj, changes)
+  def self.patch!(obj, changes, delimiter='.')
     changes.each do |change|
-      parts = decode_property_path(change[1])
+      parts = decode_property_path(change[1], delimiter)
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])
@@ -42,13 +43,14 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be unpatchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  # @param [String] delimiter Property-string delimiter
   #
   # @return the object after unpatch
   #
   # @since 0.0.1
-  def self.unpatch!(obj, changes)
+  def self.unpatch!(obj, changes, delimiter='.')
     changes.reverse_each do |change|
-      parts = decode_property_path(change[1])
+      parts = decode_property_path(change[1], delimiter)
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])

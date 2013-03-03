@@ -47,10 +47,12 @@ module HashDiff
   # @private
   #
   # decode property path into an array
+  # @param [String] path Property-string
+  # @param [String] delimiter Property-string delimiter
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
-  def self.decode_property_path(path)
-    parts = path.split('.').collect do |part|
+  def self.decode_property_path(path, delimiter='.')
+    parts = path.split(delimiter).collect do |part|
       if part =~ /^(\w*)\[(\d+)\]$/
         if $1.size > 0
           [$1, $2.to_i]

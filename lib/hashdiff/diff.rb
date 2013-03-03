@@ -17,14 +17,14 @@ module HashDiff
   #   diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
   #
   # @since 0.0.1
-  def self.best_diff(obj1, obj2)
-    diffs_1 = diff(obj1, obj2, "", 0.3)
+  def self.best_diff(obj1, obj2, delimiter='.')
+    diffs_1 = diff(obj1, obj2, "", 0.3, delimiter)
     count_1 = count_diff diffs_1
 
-    diffs_2 = diff(obj1, obj2, "", 0.5)
+    diffs_2 = diff(obj1, obj2, "", 0.5, delimiter)
     count_2 = count_diff diffs_2
 
-    diffs_3 = diff(obj1, obj2, "", 0.8)
+    diffs_3 = diff(obj1, obj2, "", 0.8, delimiter)
     count_3 = count_diff diffs_3
 
     count, diffs = count_1 < count_2 ? [count_1, diffs_1] : [count_2, diffs_2]
@@ -38,6 +38,7 @@ module HashDiff
   # @param [float] similarity A value > 0 and <= 1.
   #   This parameter should be ignored in common usage.
   #   Similarity is only meaningful if there're similar objects in arrays. See {best_diff}.
+  # @param [String] delimiter Delimiter for returned property-string
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -50,7 +51,7 @@ module HashDiff
   #   diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   #
   # @since 0.0.1
-  def self.diff(obj1, obj2, prefix = "", similarity = 0.8)
+  def self.diff(obj1, obj2, prefix = "", similarity = 0.8, delimiter='.')
     if obj1.nil? and obj2.nil?
       return []
     end
@@ -72,7 +73,7 @@ module HashDiff
       changeset = diff_array(obj1, obj2, similarity) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], "#{prefix}[#{pair[0]}]", similarity))
+          result.concat(diff(obj1[pair[0]], obj2[pair[1]], "#{prefix}[#{pair[0]}]", similarity, delimiter))
         end
       end
 
@@ -84,7 +85,7 @@ module HashDiff
         end
       end
     elsif obj1.is_a?(Hash)
-      prefix = prefix.empty? ? "" : "#{prefix}."
+      prefix = prefix.empty? ? "" : "#{prefix}#{delimiter}"
 
       deleted_keys = []
       common_keys = []
@@ -101,7 +102,7 @@ module HashDiff
       deleted_keys.each {|k| result << ['-', "#{prefix}#{k}", obj1[k]] }
 
       # recursive comparison for common keys
-      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], "#{prefix}#{k}", similarity)) }
+      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], "#{prefix}#{k}", similarity, delimiter)) }
 
       # added properties
       obj2.each do |k, v|
