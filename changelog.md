@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.0.6 2013-3-2
+
+* Add parameter for custom property-path delimiter.
+
 ## v0.0.5 2012-7-1
 
 * fix a bug in judging whehter two objects are similiar.

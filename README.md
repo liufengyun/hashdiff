@@ -25,7 +25,6 @@ HashDiff answers the question above in an opinionated approach:
 * It compares Arrays using LCS(longest common subsequence) algorithm.
 * It recoganize similar Hashes in Array using a similarity value(0 < similarity <= 1).
 
-
 ## Compatibility
 
 HashDiff is tested against `1.9.2`, `1.9.3` and `ruby-head`. It should work on other versions as well.
@@ -86,6 +85,10 @@ unpatch example:
     diff = HashDiff.diff(a, b) # diff two array is OK
     HashDiff.unpatch!(b, diff).should == a
 
+## Contributors
+
+- @liufengyun
+- @m-o-e
 
 ## License
 
