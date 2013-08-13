@@ -8,6 +8,7 @@
 /.bundle
 /doc
 /.yardoc
+/Gemfile.lock
 
 *.swp
 *.bak
