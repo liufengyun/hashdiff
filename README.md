@@ -1,6 +1,4 @@
-# HashDiff
-
-[![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.png)](http://travis-ci.org/liufengyun/hashdiff)
+# HashDiff [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.png)](http://travis-ci.org/liufengyun/hashdiff)
 
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
@@ -87,8 +85,8 @@ unpatch example:
 
 ## Contributors
 
-- @liufengyun
-- @m-o-e
+- [@liufengyun](https://github.com/liufengyun)
+- [@m-o-e](https://github.com/m-o-e)
 
 ## License
 
