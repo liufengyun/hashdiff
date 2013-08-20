@@ -23,10 +23,6 @@ HashDiff answers the question above in an opinionated approach:
 * It compares Arrays using LCS(longest common subsequence) algorithm.
 * It recoganize similar Hashes in Array using a similarity value(0 < similarity <= 1).
 
-## Compatibility
-
-HashDiff is tested against `1.9.2`, `1.9.3` and `ruby-head`. It should work on other versions as well.
-
 ## Usage
 
 If you're using bundler, add following to the Gemfile:
