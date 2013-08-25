@@ -89,7 +89,7 @@ You can specify the delimiter to be something else than the dot. For example:
     diff = HashDiff.diff(a, b, :delimiter => '\t')
     diff.should == [['-', 'a\tx', 2], ['-', 'a\tz', 4], ['-', 'b\tx', 3], ['~', 'b\tz', 45, 30], ['+', 'b\ty', 3]]
 
-In cases you have similar hash objects in array, you can pass suitable `:similarity` value instead of the default `0.8`.
+In cases you have similar hash objects in array, you can pass a suitable `:similarity` value instead of the default `0.8`.
 
 ## Contributors
 
