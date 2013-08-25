@@ -13,10 +13,9 @@ describe HashDiff do
     a = {'x' => [{'a' => 1, 'c' => 3, 'e' => 5}, {'y' => 3}]}
     b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
 
-    diff = HashDiff.best_diff(a, b, "\t")
+    diff = HashDiff.best_diff(a, b, :delimiter => "\t")
     diff.should == [["-", "x[0]\tc", 3], ["+", "x[0]\tb", 2], ["-", "x[1]", {"y"=>3}]]
   end
-
 
   it "should be able to best diff array in hash" do
     a = {"menu" => {

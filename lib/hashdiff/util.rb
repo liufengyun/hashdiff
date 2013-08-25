@@ -6,7 +6,7 @@ module HashDiff
   def self.similar?(a, b, similarity = 0.8)
     count_a = count_nodes(a)
     count_b = count_nodes(b)
-    diffs = count_diff diff(a, b, "", similarity)
+    diffs = count_diff diff(a, b, :similarity => similarity)
 
     if count_a + count_b == 0
       return true

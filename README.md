@@ -79,6 +79,18 @@ unpatch example:
     diff = HashDiff.diff(a, b) # diff two array is OK
     HashDiff.unpatch!(b, diff).should == a
 
+### Options
+
+You can specify the delimiter to be something else than the dot. For example:
+
+    a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
+    b = {a:{y:3}, b:{y:3, z:30}}
+
+    diff = HashDiff.diff(a, b, :delimiter => '\t')
+    diff.should == [['-', 'a\tx', 2], ['-', 'a\tz', 4], ['-', 'b\tx', 3], ['~', 'b\tz', 45, 30], ['+', 'b\ty', 3]]
+
+In cases you have similar hash objects in array, you can pass suitable `:similarity` value instead of the default `0.8`.
+
 ## Contributors
 
 - [@liufengyun](https://github.com/liufengyun)

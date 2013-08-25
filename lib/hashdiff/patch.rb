@@ -7,12 +7,15 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be patchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
-  # @param [String] delimiter Property-string delimiter
+  # @param [Hash] options
+  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
   #
   # @return the object after patch
   #
   # @since 0.0.1
-  def self.patch!(obj, changes, delimiter='.')
+  def self.patch!(obj, changes, options = {})
+    delimiter = options[:delimiter] || '.'
+
     changes.each do |change|
       parts = decode_property_path(change[1], delimiter)
       last_part = parts.last
@@ -43,12 +46,15 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be unpatchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
-  # @param [String] delimiter Property-string delimiter
+  # @param [Hash] options
+  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
   #
   # @return the object after unpatch
   #
   # @since 0.0.1
-  def self.unpatch!(obj, changes, delimiter='.')
+  def self.unpatch!(obj, changes, options = {})
+    delimiter = options[:delimiter] || '.'
+
     changes.reverse_each do |change|
       parts = decode_property_path(change[1], delimiter)
       last_part = parts.last

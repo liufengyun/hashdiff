@@ -2,10 +2,12 @@ module HashDiff
 
   # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #
-  # HashDiff.best_diff is only meaningful in case of comparing two objects which includes similar objects in array.
+  # HashDiff.best_diff is useful in case of comparing two objects which includes similar hashes in array.
   #
   # @param [Arrary, Hash] obj1
   # @param [Arrary, Hash] obj2
+  # @param [Hash] options
+  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -17,14 +19,17 @@ module HashDiff
   #   diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
   #
   # @since 0.0.1
-  def self.best_diff(obj1, obj2, delimiter='.')
-    diffs_1 = diff(obj1, obj2, "", 0.3, delimiter)
+  def self.best_diff(obj1, obj2, options = {})
+    opts = {similarity: 0.3}.merge!(options)
+    diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
 
-    diffs_2 = diff(obj1, obj2, "", 0.5, delimiter)
+    opts = {similarity: 0.5}.merge!(options)
+    diffs_2 = diff(obj1, obj2, opts)
     count_2 = count_diff diffs_2
 
-    diffs_3 = diff(obj1, obj2, "", 0.8, delimiter)
+    opts = {similarity: 0.8}.merge!(options)
+    diffs_3 = diff(obj1, obj2, opts)
     count_3 = count_diff diffs_3
 
     count, diffs = count_1 < count_2 ? [count_1, diffs_1] : [count_2, diffs_2]
@@ -35,10 +40,12 @@ module HashDiff
   #
   # @param [Arrary, Hash] obj1
   # @param [Arrary, Hash] obj2
-  # @param [float] similarity A value > 0 and <= 1.
-  #   This parameter should be ignored in common usage.
-  #   Similarity is only meaningful if there're similar objects in arrays. See {best_diff}.
-  # @param [String] delimiter Delimiter for returned property-string
+  # @param [Hash] options
+  #   `options` can contain `:similarity` or `:delimiter`.
+  #
+  #   `:similarity` should be between (0, 1]. The default value is `0.8`. `:similarity` is meaningful if there're similar hashes in arrays. See {best_diff}.
+  #
+  #   `:delimiter` defaults to `.`(dot).
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -51,41 +58,53 @@ module HashDiff
   #   diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   #
   # @since 0.0.1
-  def self.diff(obj1, obj2, prefix = "", similarity = 0.8, delimiter='.')
+  def self.diff(obj1, obj2, options = {})
+    opts = {
+      :prefix      =>   '',
+      :similarity  =>   0.8,
+      :delimiter   =>   '.'
+    }
+
+    opts = opts.merge!(options)
+
     if obj1.nil? and obj2.nil?
       return []
     end
 
     if obj1.nil?
-      return [['~', prefix, nil, obj2]]
+      return [['~', opts[:prefix], nil, obj2]]
     end
 
     if obj2.nil?
-      return [['~', prefix, obj1, nil]]
+      return [['~', opts[:prefix], obj1, nil]]
     end
 
     if !(obj1.is_a?(Array) and obj2.is_a?(Array)) and !(obj1.is_a?(Hash) and obj2.is_a?(Hash)) and !(obj1.is_a?(obj2.class) or obj2.is_a?(obj1.class))
-      return [['~', prefix, obj1, obj2]]
+      return [['~', opts[:prefix], obj1, obj2]]
     end
 
     result = []
     if obj1.is_a?(Array)
-      changeset = diff_array(obj1, obj2, similarity) do |lcs|
+      changeset = diff_array(obj1, obj2, opts[:similarity]) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], "#{prefix}[#{pair[0]}]", similarity, delimiter))
+          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: "#{opts[:prefix]}[#{pair[0]}]")))
         end
       end
 
       changeset.each do |change|
         if change[0] == '-'
-          result << ['-', "#{prefix}[#{change[1]}]", change[2]]
+          result << ['-', "#{opts[:prefix]}[#{change[1]}]", change[2]]
         elsif change[0] == '+'
-          result << ['+', "#{prefix}[#{change[1]}]", change[2]]
+          result << ['+', "#{opts[:prefix]}[#{change[1]}]", change[2]]
         end
       end
     elsif obj1.is_a?(Hash)
-      prefix = prefix.empty? ? "" : "#{prefix}#{delimiter}"
+      if opts[:prefix].empty?
+        prefix = ""
+      else
+        prefix = "#{opts[:prefix]}#{opts[:delimiter]}"
+      end
 
       deleted_keys = []
       common_keys = []
@@ -102,7 +121,7 @@ module HashDiff
       deleted_keys.each {|k| result << ['-', "#{prefix}#{k}", obj1[k]] }
 
       # recursive comparison for common keys
-      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], "#{prefix}#{k}", similarity, delimiter)) }
+      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: "#{prefix}#{k}"))) }
 
       # added properties
       obj2.each do |k, v|
@@ -112,7 +131,7 @@ module HashDiff
       end
     else
       return [] if obj1 == obj2
-      return [['~', prefix, obj1, obj2]]
+      return [['~', opts[:prefix], obj1, obj2]]
     end
 
     result

@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.1.0 2013-8-25
+
+* use options for parameters `:delimiter` and `:similarity` in interfaces
+
 ## v0.0.6 2013-3-2
 
 * Add parameter for custom property-path delimiter.

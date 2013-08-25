@@ -134,4 +134,3 @@ describe HashDiff do
   end
 
 end
-

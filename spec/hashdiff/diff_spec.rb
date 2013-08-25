@@ -127,7 +127,7 @@ describe HashDiff do
     a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 3]
     b = [{'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}, 3]
 
-    diff = HashDiff.diff(a, b, "", 0.8, "\t")
+    diff = HashDiff.diff(a, b, similarity: 0.8, delimiter: "\t")
     diff.should == [["-", "[0]\td", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
