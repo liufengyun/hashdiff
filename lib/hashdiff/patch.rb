@@ -7,8 +7,8 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be patchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
-  # @param [Hash] options
-  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
+  # @param [Hash] options supports following keys:
+  #   :delimiter - default value is '.'(dot).
   #
   # @return the object after patch
   #
@@ -46,8 +46,8 @@ module HashDiff
   #
   # @param [Hash, Array] obj the object to be unpatchted, can be an Array of a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
-  # @param [Hash] options
-  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
+  # @param [Hash] options supports following keys:
+  #   :delimiter - default value is '.'(dot).
   #
   # @return the object after unpatch
   #

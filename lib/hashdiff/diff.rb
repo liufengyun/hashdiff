@@ -6,8 +6,8 @@ module HashDiff
   #
   # @param [Arrary, Hash] obj1
   # @param [Arrary, Hash] obj2
-  # @param [Hash] options
-  #   `options` supports `:delimiter`. Default value for `:delimiter` is `.`(dot).
+  # @param [Hash] options supports following keys:
+  #   :delimiter - default value is '.'(dot).
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -40,12 +40,10 @@ module HashDiff
   #
   # @param [Arrary, Hash] obj1
   # @param [Arrary, Hash] obj2
-  # @param [Hash] options
-  #   `options` can contain `:similarity` or `:delimiter`.
+  # @param [Hash] options supports following keys:
+  #   :similarity - should be between (0, 1]. The default value is 0.8. :similarity is meaningful if there're similar hashes in arrays. See {best_diff}.
   #
-  #   `:similarity` should be between (0, 1]. The default value is `0.8`. `:similarity` is meaningful if there're similar hashes in arrays. See {best_diff}.
-  #
-  #   `:delimiter` defaults to `.`(dot).
+  #   :delimiter - defaults to '.'(dot).
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
