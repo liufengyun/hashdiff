@@ -4,6 +4,7 @@ require 'hashdiff/version'
 Gem::Specification.new do |s|
   s.name        = %q{hashdiff}
   s.version     = HashDiff::VERSION
+  s.license     = 'MIT'
   s.summary     = %q{ HashDiff is a diff lib to compute the smallest difference between two hashes. }
   s.description = %q{ HashDiff is a diff lib to compute the smallest difference between two hashes. }
 
