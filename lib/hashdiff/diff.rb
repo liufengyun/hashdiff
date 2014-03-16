@@ -2,12 +2,13 @@ module HashDiff
 
   # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #
-  # HashDiff.best_diff is useful in case of comparing two objects which includes similar hashes in array.
+  # HashDiff.best_diff is useful in case of comparing two objects which include similar hashes in arrays.
   #
-  # @param [Arrary, Hash] obj1
-  # @param [Arrary, Hash] obj2
-  # @param [Hash] options supports following keys:
-  #   :delimiter - default value is '.'(dot).
+  # @param [Array, Hash] obj1
+  # @param [Array, Hash] obj2
+  # @param [Hash] options the options to use when comparing
+  # @option options [String] :delimiter ('.')
+  # @option options [Numeric] :tolerance (0) should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -36,14 +37,14 @@ module HashDiff
     diffs = count < count_3 ? diffs : diffs_3
   end
 
-  # Compute the diff of two hashes
+  # Compute the diff of two hashes or arrays
   #
-  # @param [Arrary, Hash] obj1
-  # @param [Arrary, Hash] obj2
-  # @param [Hash] options supports following keys:
-  #   :similarity - should be between (0, 1]. The default value is 0.8. :similarity is meaningful if there're similar hashes in arrays. See {best_diff}.
-  #
-  #   :delimiter - defaults to '.'(dot).
+  # @param [Array, Hash] obj1
+  # @param [Array, Hash] obj2
+  # @param [Hash] options the options to use when comparing
+  # @option options [Numeric] :similarity (0.8) should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
+  # @option options [String] :delimiter ('.')
+  # @option options [Numeric] :tolerance (0) should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -61,9 +62,7 @@ module HashDiff
       :prefix      =>   '',
       :similarity  =>   0.8,
       :delimiter   =>   '.'
-    }
-
-    opts = opts.merge!(options)
+    }.merge!(options)
 
     if obj1.nil? and obj2.nil?
       return []
@@ -83,7 +82,7 @@ module HashDiff
 
     result = []
     if obj1.is_a?(Array)
-      changeset = diff_array(obj1, obj2, opts[:similarity]) do |lcs|
+      changeset = diff_array(obj1, obj2, opts) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
           result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: "#{opts[:prefix]}[#{pair[0]}]")))
@@ -128,7 +127,7 @@ module HashDiff
         end
       end
     else
-      return [] if obj1 == obj2
+      return [] if compare_within_tolerance(obj1, obj2, opts[:tolerance])
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
@@ -138,7 +137,13 @@ module HashDiff
   # @private
   #
   # diff array using LCS algorithm
-  def self.diff_array(a, b, similarity = 0.8)
+  def self.diff_array(a, b, options = {})
+    opts = {
+      :prefix      =>   '',
+      :similarity  =>   0.8,
+      :delimiter   =>   '.'
+    }.merge!(options)
+
     change_set = []
     if a.size == 0 and b.size == 0
       return []
@@ -155,7 +160,7 @@ module HashDiff
       return change_set
     end
 
-    links = lcs(a, b, similarity)
+    links = lcs(a, b, opts)
 
     # yield common
     yield links if block_given?

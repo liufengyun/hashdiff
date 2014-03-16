@@ -22,6 +22,11 @@ describe HashDiff do
     diff.should == []
   end
 
+  it "should be able to diff changes in hash value" do
+    diff = HashDiff.diff({a:2, b:3}, {a:2, b:4})
+    diff.should == [['~', 'b', 3, 4]]
+  end
+
   it "should be able to diff changes in hash value which is array" do
     diff = HashDiff.diff({a:2, b:[1, 2, 3]}, {a:2, b:[1, 3, 4]})
     diff.should == [['-', 'b[1]', 2], ['+', 'b[2]', 4]]
@@ -131,5 +136,28 @@ describe HashDiff do
     diff.should == [["-", "[0]\td", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
+  context 'when :tolerance option given' do
+    it "should be able to diff changes in hash value" do
+      a = {'a' => 0.558, 'b' => 0.0, 'c' => 0.65, 'd' => 'fin'}
+      b = {'a' => 0.557, 'b' => 'hats', 'c' => 0.67, 'd' => 'fin'}
+
+      diff = HashDiff.diff(a, b, :tolerance => 0.01)
+      diff.should == [["~", "b", 0.0, 'hats'], ["~", "c", 0.65, 0.67]]
+
+      diff = HashDiff.diff(b, a, :tolerance => 0.01)
+      diff.should == [["~", "b", 'hats', 0.0], ["~", "c", 0.67, 0.65]]
+    end
+
+    it "should be able to diff changes in nested values" do
+      a = {'a' => {'x' => 0.4, 'y' => 0.338}, 'b' => [13, 68.03]}
+      b = {'a' => {'x' => 0.6, 'y' => 0.341}, 'b' => [14, 68.025]}
+
+      diff = HashDiff.diff(a, b, :tolerance => 0.01)
+      diff.should == [["~", "a.x", 0.4, 0.6], ["-", "b[0]", 13], ["+", "b[0]", 14]]
+
+      diff = HashDiff.diff(b, a, :tolerance => 0.01)
+      diff.should == [["~", "a.x", 0.6, 0.4], ["-", "b[0]", 14], ["+", "b[0]", 13]]
+    end
+  end
 end
 

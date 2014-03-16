@@ -3,15 +3,17 @@ module HashDiff
   # @private
   #
   # judge whether two objects are similar
-  def self.similar?(a, b, similarity = 0.8)
+  def self.similar?(a, b, options = {})
+    opts = { :similarity => 0.8 }.merge(options)
+
     count_a = count_nodes(a)
     count_b = count_nodes(b)
-    diffs = count_diff diff(a, b, :similarity => similarity)
+    diffs = count_diff diff(a, b, opts)
 
     if count_a + count_b == 0
       return true
     else
-      (1 - diffs.to_f/(count_a + count_b).to_f) >= similarity
+      (1 - diffs.to_f/(count_a + count_b).to_f) >= opts[:similarity]
     end
   end
 
@@ -78,4 +80,14 @@ module HashDiff
     temp
   end
 
+  # @private
+  #
+  # check for equality or "closeness" within given tolerance
+  def self.compare_within_tolerance(obj1, obj2, tolerance = nil)
+    if tolerance && obj1.respond_to?(:-)
+      (obj1 - obj2).abs <= tolerance
+    else
+      obj1 == obj2
+    end
+  end
 end
