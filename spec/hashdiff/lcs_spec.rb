@@ -9,6 +9,14 @@ describe HashDiff do
     lcs.should == [[0, 0], [1, 1], [2, 2]]
   end
 
+  it "should be able to find LCS between two close arrays" do
+    a = [1.05, 2, 3.25]
+    b = [1.06, 2, 3.24]
+
+    lcs = HashDiff.lcs(a, b, :tolerance => 0.1)
+    lcs.should == [[0, 0], [1, 1], [2, 2]]
+  end
+
   it "should be able to find LCS with one common elements" do
     a = [1, 2, 3]
     b = [1, 8, 7]
@@ -22,6 +30,14 @@ describe HashDiff do
     b = [2, 3, 7, 5]
 
     lcs = HashDiff.lcs(a, b)
+    lcs.should == [[1, 1], [2, 3]]
+  end
+
+  it "should be able to find LCS with two close elements" do
+    a = [1, 3.05, 5, 7]
+    b = [2, 3.06, 7, 5]
+
+    lcs = HashDiff.lcs(a, b, :tolerance => 0.1)
     lcs.should == [[1, 1], [2, 3]]
   end
 
@@ -44,7 +60,7 @@ describe HashDiff do
           {"value" => "Close", "onclick" => "CloseDoc()"}
         ]
 
-    lcs = HashDiff.lcs(a, b, 0.5)
+    lcs = HashDiff.lcs(a, b, :similarity => 0.5)
     lcs.should == [[0, 0], [1, 2]]
   end
 end
