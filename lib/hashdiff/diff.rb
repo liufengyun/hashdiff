@@ -7,8 +7,12 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  # @option options [String] :delimiter ('.')
-  # @option options [Numeric] :tolerance (0) should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
+  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
+  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -20,7 +24,9 @@ module HashDiff
   #   diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
   #
   # @since 0.0.1
-  def self.best_diff(obj1, obj2, options = {})
+  def self.best_diff(obj1, obj2, options = {}, &block)
+    options[:comparison] = block if block_given?
+
     opts = {similarity: 0.3}.merge!(options)
     diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
@@ -42,9 +48,13 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  # @option options [Numeric] :similarity (0.8) should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
-  # @option options [String] :delimiter ('.')
-  # @option options [Numeric] :tolerance (0) should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
+  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
+  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
+  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -57,12 +67,14 @@ module HashDiff
   #   diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   #
   # @since 0.0.1
-  def self.diff(obj1, obj2, options = {})
+  def self.diff(obj1, obj2, options = {}, &block)
     opts = {
       :prefix      =>   '',
       :similarity  =>   0.8,
       :delimiter   =>   '.'
     }.merge!(options)
+
+    opts[:comparison] = block if block_given?
 
     if obj1.nil? and obj2.nil?
       return []
@@ -76,7 +88,7 @@ module HashDiff
       return [['~', opts[:prefix], obj1, nil]]
     end
 
-    if !(obj1.is_a?(Array) and obj2.is_a?(Array)) and !(obj1.is_a?(Hash) and obj2.is_a?(Hash)) and !(obj1.is_a?(obj2.class) or obj2.is_a?(obj1.class))
+    unless comparable?(obj1, obj2)
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
@@ -127,7 +139,7 @@ module HashDiff
         end
       end
     else
-      return [] if compare_within_tolerance(obj1, obj2, opts[:tolerance])
+      return [] if compare_values(obj1, obj2, opts)
       return [['~', opts[:prefix], obj1, obj2]]
     end
 

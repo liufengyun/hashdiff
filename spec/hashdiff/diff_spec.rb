@@ -22,9 +22,14 @@ describe HashDiff do
     diff.should == []
   end
 
+  it "should be able to diff two hashes with equivalent numerics" do
+    diff = HashDiff.diff({a:2.0, b:2}, {a:2, b:2.0})
+    diff.should == []
+  end
+
   it "should be able to diff changes in hash value" do
-    diff = HashDiff.diff({a:2, b:3}, {a:2, b:4})
-    diff.should == [['~', 'b', 3, 4]]
+    diff = HashDiff.diff({a:2, b:3, c:" hello"}, {a:2, b:4, c:"hello"})
+    diff.should == [['~', 'b', 3, 4], ['~', 'c', " hello", "hello"]]
   end
 
   it "should be able to diff changes in hash value which is array" do
@@ -136,27 +141,73 @@ describe HashDiff do
     diff.should == [["-", "[0]\td", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
-  context 'when :tolerance option given' do
-    it "should be able to diff changes in hash value" do
-      a = {'a' => 0.558, 'b' => 0.0, 'c' => 0.65, 'd' => 'fin'}
-      b = {'a' => 0.557, 'b' => 'hats', 'c' => 0.67, 'd' => 'fin'}
+  context 'when :comparison option given' do
+    context 'when :numeric_tolerance requested' do
+      it "should be able to diff changes in hash value" do
+        a = {'a' => 0.558, 'b' => 0.0, 'c' => 0.65, 'd' => 'fin'}
+        b = {'a' => 0.557, 'b' => 'hats', 'c' => 0.67, 'd' => 'fin'}
 
-      diff = HashDiff.diff(a, b, :tolerance => 0.01)
-      diff.should == [["~", "b", 0.0, 'hats'], ["~", "c", 0.65, 0.67]]
+        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.01 })
+        diff.should == [["~", "b", 0.0, 'hats'], ["~", "c", 0.65, 0.67]]
 
-      diff = HashDiff.diff(b, a, :tolerance => 0.01)
-      diff.should == [["~", "b", 'hats', 0.0], ["~", "c", 0.67, 0.65]]
+        diff = HashDiff.diff(b, a, :comparison => { :numeric_tolerance => 0.01 })
+        diff.should == [["~", "b", 'hats', 0.0], ["~", "c", 0.67, 0.65]]
+      end
+
+      it "should be able to diff changes in nested values" do
+        a = {'a' => {'x' => 0.4, 'y' => 0.338}, 'b' => [13, 68.03]}
+        b = {'a' => {'x' => 0.6, 'y' => 0.341}, 'b' => [14, 68.025]}
+
+        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.01 })
+        diff.should == [["~", "a.x", 0.4, 0.6], ["-", "b[0]", 13], ["+", "b[0]", 14]]
+
+        diff = HashDiff.diff(b, a, :comparison => { :numeric_tolerance => 0.01 })
+        diff.should == [["~", "a.x", 0.6, 0.4], ["-", "b[0]", 14], ["+", "b[0]", 13]]
+      end
     end
 
-    it "should be able to diff changes in nested values" do
-      a = {'a' => {'x' => 0.4, 'y' => 0.338}, 'b' => [13, 68.03]}
-      b = {'a' => {'x' => 0.6, 'y' => 0.341}, 'b' => [14, 68.025]}
+    context 'when :strip requested' do
+      it "should strip strings before comparing" do
+        a = {a:" foo", b:"fizz buzz"}
+        b = {a:"foo", b:"fizzbuzz"}
+        diff = HashDiff.diff(a, b, :comparison => { :strip => true })
+        diff.should == [['~', 'b', "fizz buzz", "fizzbuzz"]]
+      end
 
-      diff = HashDiff.diff(a, b, :tolerance => 0.01)
-      diff.should == [["~", "a.x", 0.4, 0.6], ["-", "b[0]", 13], ["+", "b[0]", 14]]
+      it "should strip nested strings before comparing" do
+        a = {a:{x:" foo"}, b:["fizz buzz", "nerf"]}
+        b = {a:{x:"foo"}, b:["fizzbuzz", "nerf"]}
+        diff = HashDiff.diff(a, b, :comparison => { :strip => true })
+        diff.should == [['-', 'b[0]', "fizz buzz"], ['+', 'b[0]', "fizzbuzz"]]
+      end
+    end
 
-      diff = HashDiff.diff(b, a, :tolerance => 0.01)
-      diff.should == [["~", "a.x", 0.6, 0.4], ["-", "b[0]", 14], ["+", "b[0]", 13]]
+    context 'when both :strip and :numeric_tolerance requested' do
+      it 'should apply filters to proper object types' do
+        a = {a:" foo", b:35, c:'bar', d:'baz'}
+        b = {a:"foo", b:35.005, c:'bar', d:18.5}
+        options = { :numeric_tolerance => 0.01, :strip => true }
+        diff = HashDiff.diff(a, b, :comparison => options)
+        diff.should == [['~', 'd', "baz", 18.5]]
+      end
+    end
+
+    context 'with custom comparison' do
+      let(:a) { {a:'car', b:'boat', c:'plane'} }
+      let(:b) { {a:'bus', b:'truck', c:' plan'} }
+
+      it 'should compare using proc specified in options hash' do
+        comparison_proc = lambda { |prefix, obj1, obj2| obj1.length == obj2.length }
+        diff = HashDiff.diff(a, b, :comparison => comparison_proc)
+        diff.should == [['~', 'b', 'boat', 'truck']]
+      end
+
+      it 'should compare using proc specified in block' do
+        diff = HashDiff.diff(a, b) do |prefix, obj1, obj2|
+          obj1.length == obj2.length
+        end
+        diff.should == [['~', 'b', 'boat', 'truck']]
+      end
     end
   end
 end

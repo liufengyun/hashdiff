@@ -21,7 +21,7 @@ describe HashDiff do
   it "should be able to tell similiar hash with values within tolerance" do
     a = {'a' => 1.5, 'b' => 2.25, 'c' => 3, 'd' => 4, 'e' => 5}
     b = {'a' => 1.503, 'b' => 2.22, 'c' => 3, 'e' => 5}
-    HashDiff.similar?(a, b, :tolerance => 0.05).should be_true
+    HashDiff.similar?(a, b, :comparison => { :numeric_tolerance => 0.05 }).should be_true
     HashDiff.similar?(a, b).should be_false
   end
 
@@ -46,19 +46,27 @@ describe HashDiff do
     HashDiff.similar?(a, b, :similarity => 0.5).should be_false
   end
 
-  describe '.compare_within_tolerance' do
+  describe '.compare_values' do
     it "should compare numeric values exactly when no tolerance" do
-      expect(HashDiff.compare_within_tolerance(10.004, 10.003)).to be_false
+      expect(HashDiff.compare_values(10.004, 10.003)).to be_false
     end
 
     it "should allow tolerance with numeric values" do
-      expect(HashDiff.compare_within_tolerance(10.004, 10.003, 0.01)).to be_true
+      expect(HashDiff.compare_values(10.004, 10.003, :comparison => { :numeric_tolerance => 0.01 })).to be_true
     end
 
     it "should compare other objects with or without tolerance" do
-      expect(HashDiff.compare_within_tolerance('hats', 'ninjas')).to be_false
-      expect(HashDiff.compare_within_tolerance('hats', 'ninjas', 0.01)).to be_false
-      expect(HashDiff.compare_within_tolerance('horse', 'horse')).to be_true
+      expect(HashDiff.compare_values('hats', 'ninjas')).to be_false
+      expect(HashDiff.compare_values('hats', 'ninjas', :comparison => { :numeric_tolerance => 0.01 })).to be_false
+      expect(HashDiff.compare_values('horse', 'horse')).to be_true
+    end
+
+    it 'should compare strings exactly by default' do
+      expect(HashDiff.compare_values(' horse', 'horse')).to be_false
+    end
+
+    it 'should strip strings before comparing when requested' do
+      expect(HashDiff.compare_values(' horse', 'horse', :comparison => { :strip => true })).to be_true
     end
   end
 end

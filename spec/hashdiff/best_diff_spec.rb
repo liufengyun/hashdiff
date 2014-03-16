@@ -17,6 +17,14 @@ describe HashDiff do
     diff.should == [["-", "x[0]\tc", 3], ["+", "x[0]\tb", 2], ["-", "x[1]", {"y"=>3}]]
   end
 
+  it "should use custom comparison when provided" do
+    a = {'x' => [{'a' => 'foo', 'c' => 'goat', 'e' => 'snake'}, {'y' => 'baz'}]}
+    b = {'x' => [{'a' => 'bar', 'b' => 'cow', 'e' => 'puppy'}] }
+
+    diff = HashDiff.best_diff(a, b, :comparison => lambda { |p, o1, o2| o1.length == o2.length })
+    diff.should == [["-", "x[0].c", 'goat'], ["+", "x[0].b", 'cow'], ["-", "x[1]", {"y"=>'baz'}]]
+  end
+
   it "should be able to best diff array in hash" do
     a = {"menu" => {
       "id" => "file",

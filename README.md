@@ -81,7 +81,7 @@ unpatch example:
 
 ### Options
 
-There are three options available: `:delimiter`, `:similarity`, and `:tolerance`.
+There are three options available: `:delimiter`, `:similarity`, and `:comparison`.
 
 #### `:delimiter`
 
@@ -97,20 +97,48 @@ You can specify `:delimiter` to be something other than the default dot. For exa
 
 In cases where you have similar hash objects in arrays, you can pass a custom value for `:similarity` instead of the default `0.8`.  This is interpreted as a ratio of similarity (default is 80% similar, whereas `:similarity => 0.5` would look for at least a 50% similarity).
 
-#### `:tolerance`
+#### `:comparison`
 
-By default, values will be compared exactly (using `==`).  However, there are situations (especially in comparison of float calculations) in which you want the comparison to be a "close" comparison.  Specifying a `:tolerance` option will compare numeric values within the given tolerance.  For example:
+By default, values will be compared exactly (using `==`).  However, there are situations in which you may want to use a different comparison method.
 
-    a = {x:5, y:3.75, z:7, w:[3, 4.45]}
-    b = {x:6, y:3.76, z:7, w:[3, 4.47]}
+You have two options for using a different comparison method:
 
-    # without :tolerance, numbers are compared exactly
-    diff = HashDiff.diff(a, b)
-    diff.should == [["~", "x", 5, 6], ["~", "y", 3.75, 3.76], ["-", "w[1]", 4.45], ["+", "w[1]", 4.47]]
+1. Specifying built-in numeric and string tolerance options:
 
-    # the :tolerance option allows for a small numeric tolerance
-    diff = HashDiff.diff(a, b, :tolerance => 0.1)
-    diff.should == [["~", "x", 5, 6]]
+        a = {x:5, y:3.75, z:7, a:[3, 4.45], s:'foo '}
+        b = {x:6, y:3.76, z:7, a:[3, 4.47], s:'foo'}
+
+        # without :numeric_tolerance or :strip, numbers and strings are compared exactly
+        diff = HashDiff.diff(a, b)
+        diff.should == [["~", "x", 5, 6], ["~", "y", 3.75, 3.76], ["-", "w[1]", 4.45], ["+", "w[1]", 4.47], ["~", "s", 'foo ', 'foo']]
+
+        # the :numeric_tolerance option allows for a small numeric tolerance
+        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1 })
+        diff.should == [["~", "x", 5, 6], ["~", "s", 'foo ', 'foo']]
+
+        # the :strip option strips all strings before comparing
+        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
+        diff.should == [["~", "x", 5, 6]]
+
+2. Specifying a custom comparison method:
+
+        a = {a:'car', b:'boat', c:'plane'}
+        b = {a:'bus', b:'truck', c:' plan'}
+
+        # you can specify a proc as the :comparison option...
+        comparison_proc = lambda do |path, obj1, obj2|
+          obj1.length == obj2.length
+        end
+        diff = HashDiff.diff(a, b, :comparison => comparison_proc)
+        diff.should == [['~', 'b', 'boat', 'truck']]
+
+        # ...or you can use a block.
+        diff = HashDiff.diff(a, b) do |path, obj1, obj2|
+          obj1.length == obj2.length
+        end
+        diff.should == [['~', 'b', 'boat', 'truck']]
+
+  When using a custom comparison method, the yielded params will be `|path, obj1, obj2|`, in which path is the key (or delimited compound key) to the value being compared.
 
 ## Contributors
 
