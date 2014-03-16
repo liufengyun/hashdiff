@@ -7,6 +7,7 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
   #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
@@ -48,6 +49,7 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
   #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
@@ -71,7 +73,8 @@ module HashDiff
     opts = {
       :prefix      =>   '',
       :similarity  =>   0.8,
-      :delimiter   =>   '.'
+      :delimiter   =>   '.',
+      :strict      =>   true,
     }.merge!(options)
 
     opts[:comparison] = block if block_given?
@@ -88,7 +91,7 @@ module HashDiff
       return [['~', opts[:prefix], obj1, nil]]
     end
 
-    unless comparable?(obj1, obj2)
+    unless comparable?(obj1, obj2, opts[:strict])
       return [['~', opts[:prefix], obj1, obj2]]
     end
 

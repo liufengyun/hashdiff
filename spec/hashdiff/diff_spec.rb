@@ -22,8 +22,8 @@ describe HashDiff do
     diff.should == []
   end
 
-  it "should be able to diff two hashes with equivalent numerics" do
-    diff = HashDiff.diff({a:2.0, b:2}, {a:2, b:2.0})
+  it "should be able to diff two hashes with equivalent numerics, when strict is false" do
+    diff = HashDiff.diff({a:2.0, b:2}, {a:2, b:2.0}, :strict => false)
     diff.should == []
   end
 
@@ -187,7 +187,7 @@ describe HashDiff do
         a = {a:" foo", b:35, c:'bar', d:'baz'}
         b = {a:"foo", b:35.005, c:'bar', d:18.5}
         options = { :numeric_tolerance => 0.01, :strip => true }
-        diff = HashDiff.diff(a, b, :comparison => options)
+        diff = HashDiff.diff(a, b, :strict => false, :comparison => options)
         diff.should == [['~', 'd', "baz", 18.5]]
       end
     end

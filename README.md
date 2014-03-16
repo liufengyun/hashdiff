@@ -81,7 +81,7 @@ unpatch example:
 
 ### Options
 
-There are three options available: `:delimiter`, `:similarity`, and `:comparison`.
+There are four options available: `:delimiter`, `:similarity`, `:strict`, and `:comparison`.
 
 #### `:delimiter`
 
@@ -96,6 +96,10 @@ You can specify `:delimiter` to be something other than the default dot. For exa
 #### `:similarity`
 
 In cases where you have similar hash objects in arrays, you can pass a custom value for `:similarity` instead of the default `0.8`.  This is interpreted as a ratio of similarity (default is 80% similar, whereas `:similarity => 0.5` would look for at least a 50% similarity).
+
+#### `:strict`
+
+The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, a Fixnum will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
 
 #### `:comparison`
 

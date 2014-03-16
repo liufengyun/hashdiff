@@ -88,9 +88,9 @@ module HashDiff
     when Proc
       return comparison.call(options[:prefix], obj1, obj2)
     when Hash
-      if (tolerance = comparison[:numeric_tolerance]) &&
+      if (comparison[:numeric_tolerance].is_a? Numeric) &&
           [obj1, obj2].all? { |v| v.is_a? Numeric }
-        return (obj1 - obj2).abs <= tolerance
+        return (obj1 - obj2).abs <= comparison[:numeric_tolerance]
       end
       if comparison[:strip] == true
         first = obj1.strip if obj1.respond_to?(:strip)
@@ -104,10 +104,11 @@ module HashDiff
   # @private
   #
   # check if objects are comparable
-  def self.comparable?(obj1, obj2)
-    [Array, Hash, Numeric].each do |type|
+  def self.comparable?(obj1, obj2, strict = true)
+    [Array, Hash].each do |type|
       return true if obj1.is_a?(type) && obj2.is_a?(type)
     end
+    return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)
   end
 end
