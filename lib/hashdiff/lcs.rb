@@ -6,6 +6,8 @@ module HashDiff
   def self.lcs(a, b, options = {})
     opts = { :similarity => 0.8 }.merge!(options)
 
+    opts[:prefix] = "#{opts[:prefix]}[*]"
+
     return [] if a.size == 0 or b.size == 0
 
     a_start = b_start = 0

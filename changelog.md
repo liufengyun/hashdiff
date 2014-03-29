@@ -1,5 +1,10 @@
 # Change Log
 
+## v0.2.0 2014-3-29
+
+* support custom comparison blocks
+* support `:strip`, `:numeric_tolerance` and `:strict` options
+
 ## v0.1.0 2013-8-25
 
 * use options for parameters `:delimiter` and `:similarity` in interfaces

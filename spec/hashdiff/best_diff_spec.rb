@@ -21,7 +21,13 @@ describe HashDiff do
     a = {'x' => [{'a' => 'foo', 'c' => 'goat', 'e' => 'snake'}, {'y' => 'baz'}]}
     b = {'x' => [{'a' => 'bar', 'b' => 'cow', 'e' => 'puppy'}] }
 
-    diff = HashDiff.best_diff(a, b, :comparison => lambda { |p, o1, o2| o1.length == o2.length })
+    diff = HashDiff.best_diff(a, b) do |path, obj1, obj2|
+      case path
+      when /^x\[.\]\..$/
+        obj1.length == obj2.length
+      end
+    end
+
     diff.should == [["-", "x[0].c", 'goat'], ["+", "x[0].b", 'cow'], ["-", "x[1]", {"y"=>'baz'}]]
   end
 

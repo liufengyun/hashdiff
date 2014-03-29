@@ -9,11 +9,10 @@ module HashDiff
   # @param [Hash] options the options to use when comparing
   #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
-  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
-  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
-  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #
-  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -52,11 +51,10 @@ module HashDiff
   #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
   #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
-  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
-  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
-  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #
-  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -75,9 +73,25 @@ module HashDiff
       :similarity  =>   0.8,
       :delimiter   =>   '.',
       :strict      =>   true,
+      :strip       =>   false,
+      :numeric_tolerance => 0
     }.merge!(options)
 
     opts[:comparison] = block if block_given?
+
+    # prefer to compare with provided block
+    if opts[:comparison]
+      res = opts[:comparison].call(opts[:prefix], obj1, obj2)
+
+      # nil != false here
+      if res == false
+        return [['~', opts[:prefix], obj1, obj2]]
+      elsif res == true
+        return []
+      else
+        # compare with specified built-in helpers
+      end
+    end
 
     if obj1.nil? and obj2.nil?
       return []

@@ -13,7 +13,7 @@ describe HashDiff do
     a = [1.05, 2, 3.25]
     b = [1.06, 2, 3.24]
 
-    lcs = HashDiff.lcs(a, b, :comparison => { :numeric_tolerance => 0.1 })
+    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1)
     lcs.should == [[0, 0], [1, 1], [2, 2]]
   end
 
@@ -21,7 +21,7 @@ describe HashDiff do
     a = ['foo', 'bar', 'baz']
     b = [' foo', 'bar', 'zab']
 
-    lcs = HashDiff.lcs(a, b, :comparison => { :strip => true })
+    lcs = HashDiff.lcs(a, b, :strip => true)
     lcs.should == [[0, 0], [1, 1]]
   end
 
@@ -45,7 +45,7 @@ describe HashDiff do
     a = [1, 3.05, 5, 7]
     b = [2, 3.06, 7, 5]
 
-    lcs = HashDiff.lcs(a, b, :comparison => { :numeric_tolerance => 0.1 })
+    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1)
     lcs.should == [[1, 1], [2, 3]]
   end
 
@@ -70,15 +70,6 @@ describe HashDiff do
 
     lcs = HashDiff.lcs(a, b, :similarity => 0.5)
     lcs.should == [[0, 0], [1, 2]]
-  end
-
-  it 'uses custom comparison method if given' do
-    a = ['car', 'boat', 'plane']
-    b = ['bus', 'truck', ' plan']
-
-    comparison_proc = lambda { |prefix, obj1, obj2| obj1.length == obj2.length }
-    lcs = HashDiff.lcs(a, b, :comparison => comparison_proc)
-    lcs.should == [[0, 0], [2, 2]]
   end
 end
 

@@ -84,20 +84,17 @@ module HashDiff
   #
   # check for equality or "closeness" within given tolerance
   def self.compare_values(obj1, obj2, options = {})
-    case comparison = options[:comparison]
-    when Proc
-      return comparison.call(options[:prefix], obj1, obj2)
-    when Hash
-      if (comparison[:numeric_tolerance].is_a? Numeric) &&
-          [obj1, obj2].all? { |v| v.is_a? Numeric }
-        return (obj1 - obj2).abs <= comparison[:numeric_tolerance]
-      end
-      if comparison[:strip] == true
-        first = obj1.strip if obj1.respond_to?(:strip)
-        second = obj2.strip if obj2.respond_to?(:strip)
-        return first == second
-      end
+    if (options[:numeric_tolerance].is_a? Numeric) &&
+        [obj1, obj2].all? { |v| v.is_a? Numeric }
+      return (obj1 - obj2).abs <= options[:numeric_tolerance]
     end
+
+    if options[:strip] == true
+      first = obj1.strip if obj1.respond_to?(:strip)
+      second = obj2.strip if obj2.respond_to?(:strip)
+      return first == second
+    end
+
     obj1 == obj2
   end
 

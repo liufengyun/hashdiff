@@ -25,13 +25,9 @@ HashDiff answers the question above in an opinionated approach:
 
 ## Usage
 
-If you're using bundler, add the following to the Gemfile:
+To use the gem, add the following to your Gemfile:
 
     gem 'hashdiff'
-
-Or, you can run `gem install hashdiff`, then add the following line to your ruby file which uses HashDiff:
-
-    require 'hashdiff'
 
 ## Quick Start
 
@@ -81,7 +77,7 @@ unpatch example:
 
 ### Options
 
-There are four options available: `:delimiter`, `:similarity`, `:strict`, and `:comparison`.
+There are five options available: `:delimiter`, `:similarity`, `:strict`, `:numeric_tolerance` and `:strip`.
 
 #### `:delimiter`
 
@@ -101,53 +97,47 @@ In cases where you have similar hash objects in arrays, you can pass a custom va
 
 The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, a Fixnum will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
 
-#### `:comparison`
+#### `:numeric_tolerance`
 
-By default, values will be compared exactly (using `==`).  However, there are situations in which you may want to use a different comparison method.
+The :numeric_tolerance option allows for a small numeric tolerance.
 
-You have two options for using a different comparison method:
+    a = {x:5, y:3.75, z:7}
+    b = {x:6, y:3.76, z:7}
 
-1. Specifying built-in numeric and string tolerance options:
+    diff = HashDiff.diff(a, b, :numeric_tolerance => 0.1)
+    diff.should == [["~", "x", 5, 6]]
 
-        a = {x:5, y:3.75, z:7, a:[3, 4.45], s:'foo '}
-        b = {x:6, y:3.76, z:7, a:[3, 4.47], s:'foo'}
 
-        # without :numeric_tolerance or :strip, numbers and strings are compared exactly
-        diff = HashDiff.diff(a, b)
-        diff.should == [["~", "x", 5, 6], ["~", "y", 3.75, 3.76], ["-", "w[1]", 4.45], ["+", "w[1]", 4.47], ["~", "s", 'foo ', 'foo']]
+#### `:strip`
 
-        # the :numeric_tolerance option allows for a small numeric tolerance
-        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1 })
-        diff.should == [["~", "x", 5, 6], ["~", "s", 'foo ', 'foo']]
+The :strip option strips all strings before comparing.
 
-        # the :strip option strips all strings before comparing
-        diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
-        diff.should == [["~", "x", 5, 6]]
+    a = {x:5, s:'foo '}
+    b = {x:6, s:'foo'}
 
-2. Specifying a custom comparison method:
+    diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
+    diff.should == [["~", "x", 5, 6]]
 
-        a = {a:'car', b:'boat', c:'plane'}
-        b = {a:'bus', b:'truck', c:' plan'}
 
-        # you can specify a proc as the :comparison option...
-        comparison_proc = lambda do |path, obj1, obj2|
-          obj1.length == obj2.length
-        end
-        diff = HashDiff.diff(a, b, :comparison => comparison_proc)
-        diff.should == [['~', 'b', 'boat', 'truck']]
+#### Specifying a custom comparison method
 
-        # ...or you can use a block.
-        diff = HashDiff.diff(a, b) do |path, obj1, obj2|
-          obj1.length == obj2.length
-        end
-        diff.should == [['~', 'b', 'boat', 'truck']]
+It's possible to specify how the values of a key should be compared.
 
-  When using a custom comparison method, the yielded params will be `|path, obj1, obj2|`, in which path is the key (or delimited compound key) to the value being compared.
+    a = {a:'car', b:'boat', c:'plane'}
+    b = {a:'bus', b:'truck', c:' plan'}
 
-## Contributors
+    diff = HashDiff.diff(a, b) do |path, obj1, obj2|
+      case path
+      when  /pat/
+        obj1.length == obj2.length
+      end
+    end
 
-- [@liufengyun](https://github.com/liufengyun)
-- [@m-o-e](https://github.com/m-o-e)
+    diff.should == [['~', 'b', 'boat', 'truck']]
+
+The yielded params of the comparison block is `|path, obj1, obj2|`, in which path is the key (or delimited compound key) to the value being compared. When comparing elements in array, the path is with the format `array[*]`.
+
+When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
 
 ## License
 
