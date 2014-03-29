@@ -27,7 +27,9 @@ HashDiff answers the question above in an opinionated approach:
 
 To use the gem, add the following to your Gemfile:
 
-    gem 'hashdiff'
+```ruby
+gem 'hashdiff'
+```
 
 ## Quick Start
 
@@ -35,7 +37,7 @@ To use the gem, add the following to your Gemfile:
 
 Two simple hashes:
 
-```
+```ruby
 a = {a:3, b:2}
 b = {}
 
