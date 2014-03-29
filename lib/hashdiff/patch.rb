@@ -5,10 +5,10 @@ module HashDiff
 
   # Apply patch to object
   #
-  # @param [Hash, Array] obj the object to be patchted, can be an Array of a Hash
+  # @param [Hash, Array] obj the object to be patched, can be an Array or a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
   # @param [Hash] options supports following keys:
-  #   :delimiter - default value is '.'(dot).
+  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array
   #
   # @return the object after patch
   #
@@ -44,10 +44,10 @@ module HashDiff
 
   # Unpatch an object
   #
-  # @param [Hash, Array] obj the object to be unpatchted, can be an Array of a Hash
+  # @param [Hash, Array] obj the object to be unpatched, can be an Array or a Hash
   # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
   # @param [Hash] options supports following keys:
-  #   :delimiter - default value is '.'(dot).
+  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array
   #
   # @return the object after unpatch
   #

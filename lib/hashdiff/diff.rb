@@ -2,12 +2,18 @@ module HashDiff
 
   # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #
-  # HashDiff.best_diff is useful in case of comparing two objects which includes similar hashes in array.
+  # HashDiff.best_diff is useful in case of comparing two objects which include similar hashes in arrays.
   #
-  # @param [Arrary, Hash] obj1
-  # @param [Arrary, Hash] obj2
-  # @param [Hash] options supports following keys:
-  #   :delimiter - default value is '.'(dot).
+  # @param [Array, Hash] obj1
+  # @param [Array, Hash] obj2
+  # @param [Hash] options the options to use when comparing
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
+  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
+  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -19,7 +25,9 @@ module HashDiff
   #   diff.should == [['-', 'x[0].c', 3], ['+', 'x[0].b', 2], ['-', 'x[1].y', 3], ['-', 'x[1]', {}]]
   #
   # @since 0.0.1
-  def self.best_diff(obj1, obj2, options = {})
+  def self.best_diff(obj1, obj2, options = {}, &block)
+    options[:comparison] = block if block_given?
+
     opts = {similarity: 0.3}.merge!(options)
     diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
@@ -36,14 +44,19 @@ module HashDiff
     diffs = count < count_3 ? diffs : diffs_3
   end
 
-  # Compute the diff of two hashes
+  # Compute the diff of two hashes or arrays
   #
-  # @param [Arrary, Hash] obj1
-  # @param [Arrary, Hash] obj2
-  # @param [Hash] options supports following keys:
-  #   :similarity - should be between (0, 1]. The default value is 0.8. :similarity is meaningful if there're similar hashes in arrays. See {best_diff}.
+  # @param [Array, Hash] obj1
+  # @param [Array, Hash] obj2
+  # @param [Hash] options the options to use when comparing
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
+  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
+  #   * :comparison (Hash, Proc) [{}] how the values will be compared.  If Proc, will be called with |path, value1, value2|.
+  #     * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
+  #     * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #
-  #   :delimiter - defaults to '.'(dot).
+  # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. Overrides :comparison option.
   #
   # @return [Array] an array of changes.
   #   e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
@@ -56,14 +69,15 @@ module HashDiff
   #   diff.should == [['-', 'b.b1', 1], ['-', 'b.b2', 2]]
   #
   # @since 0.0.1
-  def self.diff(obj1, obj2, options = {})
+  def self.diff(obj1, obj2, options = {}, &block)
     opts = {
       :prefix      =>   '',
       :similarity  =>   0.8,
-      :delimiter   =>   '.'
-    }
+      :delimiter   =>   '.',
+      :strict      =>   true,
+    }.merge!(options)
 
-    opts = opts.merge!(options)
+    opts[:comparison] = block if block_given?
 
     if obj1.nil? and obj2.nil?
       return []
@@ -77,13 +91,13 @@ module HashDiff
       return [['~', opts[:prefix], obj1, nil]]
     end
 
-    if !(obj1.is_a?(Array) and obj2.is_a?(Array)) and !(obj1.is_a?(Hash) and obj2.is_a?(Hash)) and !(obj1.is_a?(obj2.class) or obj2.is_a?(obj1.class))
+    unless comparable?(obj1, obj2, opts[:strict])
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
     result = []
     if obj1.is_a?(Array)
-      changeset = diff_array(obj1, obj2, opts[:similarity]) do |lcs|
+      changeset = diff_array(obj1, obj2, opts) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
           result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: "#{opts[:prefix]}[#{pair[0]}]")))
@@ -128,7 +142,7 @@ module HashDiff
         end
       end
     else
-      return [] if obj1 == obj2
+      return [] if compare_values(obj1, obj2, opts)
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
@@ -138,7 +152,13 @@ module HashDiff
   # @private
   #
   # diff array using LCS algorithm
-  def self.diff_array(a, b, similarity = 0.8)
+  def self.diff_array(a, b, options = {})
+    opts = {
+      :prefix      =>   '',
+      :similarity  =>   0.8,
+      :delimiter   =>   '.'
+    }.merge!(options)
+
     change_set = []
     if a.size == 0 and b.size == 0
       return []
@@ -155,7 +175,7 @@ module HashDiff
       return change_set
     end
 
-    links = lcs(a, b, similarity)
+    links = lcs(a, b, opts)
 
     # yield common
     yield links if block_given?
