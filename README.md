@@ -166,7 +166,7 @@ diff = HashDiff.diff(a, b) do |path, obj1, obj2|
   end
 end
 
-diff.should == [['~', 'b', 'boat', 'truck']]
+diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-", "b[0]", "boat"], ["+", "b[0]", "truck"]]
 ```
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
