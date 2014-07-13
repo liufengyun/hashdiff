@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.2.1 2014-7-13
+
+* yield added/deleted keys for custom comparison
+
 ## v0.2.0 2014-3-29
 
 * support custom comparison blocks

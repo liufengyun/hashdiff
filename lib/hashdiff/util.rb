@@ -108,4 +108,20 @@ module HashDiff
     return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)
   end
+
+  # @private
+  #
+  # try custom comparison
+  def self.custom_compare(method, key, obj1, obj2)
+    if method
+      res = method.call(key, obj1, obj2)
+
+      # nil != false here
+      if res == false
+        return [['~', key, obj1, obj2]]
+      elsif res == true
+        return []
+      end
+    end
+  end
 end

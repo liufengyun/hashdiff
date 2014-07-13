@@ -204,6 +204,19 @@ describe HashDiff do
       diff.should == [['~', 'b', 'boat', 'truck']]
     end
 
+    it 'should yield added keys' do
+      x = {a:'car', b:'boat'}
+      y = {a:'car'}
+
+      diff = HashDiff.diff(x, y) do |prefix, obj1, obj2|
+        case prefix
+        when /b/
+          true
+        end
+      end
+      diff.should == []
+    end
+
     it 'should compare with both proc and :strip when both provided' do
       diff = HashDiff.diff(a, b, :strip => true) do |prefix, obj1, obj2|
         case prefix

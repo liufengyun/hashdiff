@@ -24,7 +24,7 @@ describe HashDiff do
     diff = HashDiff.best_diff(a, b) do |path, obj1, obj2|
       case path
       when /^x\[.\]\..$/
-        obj1.length == obj2.length
+        obj1.length == obj2.length if obj1 and obj2
       end
     end
 

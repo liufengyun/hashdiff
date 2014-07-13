@@ -80,18 +80,8 @@ module HashDiff
     opts[:comparison] = block if block_given?
 
     # prefer to compare with provided block
-    if opts[:comparison]
-      res = opts[:comparison].call(opts[:prefix], obj1, obj2)
-
-      # nil != false here
-      if res == false
-        return [['~', opts[:prefix], obj1, obj2]]
-      elsif res == true
-        return []
-      else
-        # compare with specified built-in helpers
-      end
-    end
+    result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
+    return result if result
 
     if obj1.nil? and obj2.nil?
       return []
@@ -144,7 +134,15 @@ module HashDiff
       end
 
       # add deleted properties
-      deleted_keys.each {|k| result << ['-', "#{prefix}#{k}", obj1[k]] }
+      deleted_keys.each do |k|
+        custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", obj1[k], nil)
+
+        if custom_result
+          result.concat(custom_result)
+        else
+          result << ['-', "#{prefix}#{k}", obj1[k]]
+        end
+      end
 
       # recursive comparison for common keys
       common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: "#{prefix}#{k}"))) }
@@ -152,7 +150,13 @@ module HashDiff
       # added properties
       obj2.each do |k, v|
         unless obj1.key?(k)
-          result << ['+', "#{prefix}#{k}", obj2[k]]
+          custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, v)
+
+          if custom_result
+            result.concat(custom_result)
+          else
+            result << ['+', "#{prefix}#{k}", obj2[k]]
+          end
         end
       end
     else
