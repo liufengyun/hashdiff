@@ -171,6 +171,35 @@ diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-",
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
 
+#### Sorting arrays before comparison
+
+An order difference alone between two arrays can create too many diffs to be useful. Consider sorting them prior to diffing.
+
+a = {a:'car', b:['boat', 'plane'] }
+b = {a:'car', b:['plane', 'boat'] }
+
+HashDiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
+
+b[:b].sort!
+
+HashDiff.diff(a, b) => []
+
+### Special use cases
+
+#### Using HashDiff on JSON API results
+
+require 'uri'
+require 'net/http'
+require 'json'
+
+uri = URI('http://time.jsontest.com/')
+json_resp = ->(uri) { JSON.parse(Net::HTTP.get_response(uri).body) }
+a = json_resp.call(uri)
+b = json_resp.call(uri)
+
+HashDiff.diff(a,b) => [["~", "milliseconds_since_epoch", 1410542545874, 1410542545985]]
+
+
 ## License
 
 HashDiff is distributed under the MIT-LICENSE.
