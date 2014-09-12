@@ -175,7 +175,7 @@ When a comparison block is given, it'll be given priority over other specified o
 
 An order difference alone between two arrays can create too many diffs to be useful. Consider sorting them prior to diffing.
 
-'''ruby
+```ruby
 a = {a:'car', b:['boat', 'plane'] }
 b = {a:'car', b:['plane', 'boat'] }
 
@@ -184,13 +184,13 @@ HashDiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
 b[:b].sort!
 
 HashDiff.diff(a, b) => []
-'''
+```
 
 ### Special use cases
 
 #### Using HashDiff on JSON API results
 
-'''ruby
+```ruby
 require 'uri'
 require 'net/http'
 require 'json'
@@ -201,7 +201,7 @@ a = json_resp.call(uri)
 b = json_resp.call(uri)
 
 HashDiff.diff(a,b) => [["~", "milliseconds_since_epoch", 1410542545874, 1410542545985]]
-'''
+```
 
 ## License
 
