@@ -8,7 +8,7 @@ HashDiff is a ruby library to compute the smallest difference between two hashes
 
 ## Why HashDiff?
 
-Given two Hashes A and B, sometimes you face the question: what's the smallest changes that can be made to change A to B?
+Given two Hashes A and B, sometimes you face the question: what's the smallest modification that can be made to change A into B?
 
 An algorithm that responds to this question has to do following:
 
@@ -16,11 +16,11 @@ An algorithm that responds to this question has to do following:
 * Compute recursively -- Arrays and Hashes may be nested arbitrarily in A or B.
 * Compute the smallest change -- it should recognize similar child Hashes or child Arrays between A and B.
 
-HashDiff answers the question above in an opinionated approach:
+HashDiff answers the question above using an opinionated approach:
 
 * Hash can be represented as a list of (dot-syntax-path, value) pairs. For example, `{a:[{c:2}]}` can be represented as `["a[0].c", 2]`.
 * The change set can be represented using the dot-syntax representation. For example, `[['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]`.
-* It compares Arrays using LCS(longest common subsequence) algorithm.
+* It compares Arrays using the [LCS(longest common subsequence)](http://en.wikipedia.org/wiki/Longest_common_subsequence_problem) algorithm.
 * It recognizes similar Hashes in an Array using a similarity value (0 < similarity <= 1).
 
 ## Usage
@@ -170,6 +170,38 @@ diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-",
 ```
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
+
+#### Sorting arrays before comparison
+
+An order difference alone between two arrays can create too many diffs to be useful. Consider sorting them prior to diffing.
+
+```ruby
+a = {a:'car', b:['boat', 'plane'] }
+b = {a:'car', b:['plane', 'boat'] }
+
+HashDiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
+
+b[:b].sort!
+
+HashDiff.diff(a, b) => []
+```
+
+### Special use cases
+
+#### Using HashDiff on JSON API results
+
+```ruby
+require 'uri'
+require 'net/http'
+require 'json'
+
+uri = URI('http://time.jsontest.com/')
+json_resp = ->(uri) { JSON.parse(Net::HTTP.get_response(uri).body) }
+a = json_resp.call(uri)
+b = json_resp.call(uri)
+
+HashDiff.diff(a,b) => [["~", "milliseconds_since_epoch", 1410542545874, 1410542545985]]
+```
 
 ## License
 
