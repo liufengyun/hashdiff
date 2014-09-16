@@ -4,6 +4,9 @@ module HashDiff
   #
   # judge whether two objects are similar
   def self.similar?(a, b, options = {})
+    if(a.is_a?(Hash) && b.is_a?(Hash) && a["id"].present? && b["id"].present?)
+      return a["id"] == b["id"]
+    end
     opts = { :similarity => 0.8 }.merge(options)
 
     count_a = count_nodes(a)
