@@ -27,15 +27,15 @@ module HashDiff
   def self.best_diff(obj1, obj2, options = {}, &block)
     options[:comparison] = block if block_given?
 
-    opts = {similarity: 0.3}.merge!(options)
+    opts = { :similarity => 0.3 }.merge!(options)
     diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
 
-    opts = {similarity: 0.5}.merge!(options)
+    opts = { :similarity => 0.5 }.merge!(options)
     diffs_2 = diff(obj1, obj2, opts)
     count_2 = count_diff diffs_2
 
-    opts = {similarity: 0.8}.merge!(options)
+    opts = { :similarity => 0.8 }.merge!(options)
     diffs_3 = diff(obj1, obj2, opts)
     count_3 = count_diff diffs_3
 
@@ -104,7 +104,7 @@ module HashDiff
       changeset = diff_array(obj1, obj2, opts) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: "#{opts[:prefix]}[#{pair[0]}]")))
+          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(:prefix => "#{opts[:prefix]}[#{pair[0]}]")))
         end
       end
 
@@ -122,19 +122,12 @@ module HashDiff
         prefix = "#{opts[:prefix]}#{opts[:delimiter]}"
       end
 
-      deleted_keys = []
-      common_keys = []
-
-      obj1.each do |k, v|
-        if obj2.key?(k)
-          common_keys << k
-        else
-          deleted_keys << k
-        end
-      end
+      deleted_keys = obj1.keys - obj2.keys
+      common_keys = obj1.keys & obj2.keys
+      added_keys = obj2.keys - obj1.keys
 
       # add deleted properties
-      deleted_keys.each do |k|
+      deleted_keys.sort.each do |k|
         custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", obj1[k], nil)
 
         if custom_result
@@ -145,12 +138,12 @@ module HashDiff
       end
 
       # recursive comparison for common keys
-      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: "#{prefix}#{k}"))) }
+      common_keys.sort.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => "#{prefix}#{k}"))) }
 
       # added properties
-      obj2.each do |k, v|
+      added_keys.sort.each do |k|
         unless obj1.key?(k)
-          custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, v)
+          custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, obj2[k])
 
           if custom_result
             result.concat(custom_result)
