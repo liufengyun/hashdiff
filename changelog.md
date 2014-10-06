@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.2.2 2014-10-6
+
+* make library 1.8.7 compatible
+
 ## v0.2.1 2014-7-13
 
 * yield added/deleted keys for custom comparison
