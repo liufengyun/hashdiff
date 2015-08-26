@@ -2,8 +2,6 @@
 
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
-**Demo**: [HashDiff](http://hashdiff.herokuapp.com/)
-
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 ## Why HashDiff?
