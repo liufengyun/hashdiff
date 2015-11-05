@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.2.3 2015-11-5
+
+* improve performance of LCS algorithm #12
+
 ## v0.2.2 2014-10-6
 
 * make library 1.8.7 compatible
