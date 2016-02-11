@@ -87,7 +87,8 @@ HashDiff.unpatch!(b, diff).should == a
 
 ### Options
 
-There are five options available: `:delimiter`, `:similarity`, `:strict`, `:numeric_tolerance` and `:strip`.
+There are six options available: `:delimiter`, `:similarity`,
+`:strict`, `:numeric_tolerance`, `:strip` and `:case_insensitive`.
 
 #### `:delimiter`
 
@@ -130,6 +131,18 @@ a = {x:5, s:'foo '}
 b = {x:6, s:'foo'}
 
 diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
+diff.should == [["~", "x", 5, 6]]
+```
+
+#### `:case_insensitive`
+
+The :case_insensitive option makes string comparisions ignore case.
+
+```ruby
+a = {x:5, s:'FooBar'}
+b = {x:6, s:'foobar'}
+
+diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
 diff.should == [["~", "x", 5, 6]]
 ```
 
