@@ -63,11 +63,16 @@ describe HashDiff do
 
     it 'should compare strings exactly by default' do
       expect(HashDiff.compare_values(' horse', 'horse')).to be_false
+      expect(HashDiff.compare_values('horse', 'Horse')).to be_false
     end
 
     it 'should strip strings before comparing when requested' do
       expect(HashDiff.compare_values(' horse', 'horse', :strip => true)).to be_true
     end
+
+    it "should ignore string case when requested" do
+      expect(HashDiff.compare_values('horse', 'Horse', :case_insensitive => true)).to be_true
+    end
+
   end
 end
-

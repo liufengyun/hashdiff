@@ -90,9 +90,13 @@ module HashDiff
     end
 
     if options[:strip] == true
-      first = obj1.strip if obj1.respond_to?(:strip)
-      second = obj2.strip if obj2.respond_to?(:strip)
-      return first == second
+      obj1 = obj1.strip if obj1.respond_to?(:strip)
+      obj2 = obj2.strip if obj2.respond_to?(:strip)
+    end
+
+    if options[:case_insensitive] == true
+      obj1 = obj1.downcase if obj1.respond_to?(:downcase)
+      obj2 = obj2.downcase if obj2.respond_to?(:downcase)
     end
 
     obj1 == obj2

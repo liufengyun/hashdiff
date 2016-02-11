@@ -183,12 +183,37 @@ describe HashDiff do
     end
   end
 
+  context 'when :case_insensitive requested' do
+    it "should strip strings before comparing" do
+      a = { 'a' => "Foo", 'b' => "fizz buzz"}
+      b = { 'a' => "foo", 'b' => "fizzBuzz"}
+      diff = HashDiff.diff(a, b, :case_insensitive => true)
+      diff.should == [['~', 'b', "fizz buzz", "fizzBuzz"]]
+    end
+
+    it "should ignore case on nested strings before comparing" do
+      a = { 'a' => { 'x' => "Foo" }, 'b' => ["fizz buzz", "nerf"] }
+      b = { 'a' => { 'x' => "foo" }, 'b' => ["fizzbuzz", "nerf"] }
+      diff = HashDiff.diff(a, b, :case_insensitive => true)
+      diff.should == [['-', 'b[0]', "fizz buzz"], ['+', 'b[0]', "fizzbuzz"]]
+    end
+  end
+
   context 'when both :strip and :numeric_tolerance requested' do
     it 'should apply filters to proper object types' do
       a = { 'a' => " foo", 'b' => 35, 'c' => 'bar', 'd' => 'baz' }
       b = { 'a' => "foo", 'b' => 35.005, 'c' => 'bar', 'd' => 18.5}
       diff = HashDiff.diff(a, b, :strict => false, :numeric_tolerance => 0.01, :strip => true)
       diff.should == [['~', 'd', "baz", 18.5]]
+    end
+  end
+
+  context "when both :strip and :case_insensitive requested" do
+    it "should apply both filters to strings" do
+      a = { 'a' => " Foo", 'b' => "fizz buzz"}
+      b = { 'a' => "foo", 'b' => "fizzBuzz"}
+      diff = HashDiff.diff(a, b, :case_insensitive => true, :strip => true)
+      diff.should == [['~', 'b', "fizz buzz", "fizzBuzz"]]
     end
   end
 
