@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.0 2016-2-11
+
+* support `:case_insensitive` option
+
 ## v0.2.3 2015-11-5
 
 * improve performance of LCS algorithm #12

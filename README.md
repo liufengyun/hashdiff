@@ -197,23 +197,6 @@ b[:b].sort!
 HashDiff.diff(a, b) => []
 ```
 
-### Special use cases
-
-#### Using HashDiff on JSON API results
-
-```ruby
-require 'uri'
-require 'net/http'
-require 'json'
-
-uri = URI('http://time.jsontest.com/')
-json_resp = ->(uri) { JSON.parse(Net::HTTP.get_response(uri).body) }
-a = json_resp.call(uri)
-b = json_resp.call(uri)
-
-HashDiff.diff(a,b) => [["~", "milliseconds_since_epoch", 1410542545874, 1410542545985]]
-```
-
 ## License
 
 HashDiff is distributed under the MIT-LICENSE.
