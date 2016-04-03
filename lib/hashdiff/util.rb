@@ -20,6 +20,8 @@ end
 
 class Hash
   def count_nodes
+    return @hd_node_count unless @hd_node_count.nil?
+
     count = 0
 
     self.each do |k, v|
@@ -28,6 +30,7 @@ class Hash
       end
     end
 
+    @hd_node_count = count
     count
   end
 end
