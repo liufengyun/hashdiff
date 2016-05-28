@@ -61,6 +61,18 @@ describe HashDiff do
     HashDiff.unpatch!(b, diff).should == a
   end
 
+  it "should be able to patch array under hash key with non-word characters" do
+    a = {"a" => 1, "b-b" => [1, 2]}
+    b = {"a" => 1, "b-b" => [2, 1]}
+    diff = HashDiff.diff(a, b)
+
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, "b-b" => [1, 2]}
+    b = {"a" => 1, "b-b" => [2, 1]}
+    HashDiff.unpatch!(b, diff).should == a
+  end
+
   it "should be able to patch hash value removal" do
     a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
     b = {"a" => 1}
