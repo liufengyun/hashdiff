@@ -55,7 +55,7 @@ module HashDiff
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
   def self.decode_property_path(path, delimiter='.')
     parts = path.split(delimiter).collect do |part|
-      if part =~ /^(\w*)\[(\d+)\]$/
+      if part =~ /^(.*)\[(\d+)\]$/
         if $1.size > 0
           [$1, $2.to_i]
         else
