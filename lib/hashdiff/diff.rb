@@ -11,6 +11,7 @@ module HashDiff
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :max_diff_count (Numeric) - [nil] - the number of differences returned from function will be maximaly this number
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
@@ -53,6 +54,7 @@ module HashDiff
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :max_diff_count (Numeric) - [nil] - the number of differences returned from function will be maximaly this number
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
@@ -74,7 +76,7 @@ module HashDiff
       :delimiter   =>   '.',
       :strict      =>   true,
       :strip       =>   false,
-      :numeric_tolerance => 0
+      :numeric_tolerance => 0,
     }.merge!(options)
 
     opts[:comparison] = block if block_given?
@@ -128,6 +130,8 @@ module HashDiff
 
       # add deleted properties
       deleted_keys.sort.each do |k|
+        break if options.include?(:max_diff_count) and result.count > options[:max_diff_count]
+
         custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", obj1[k], nil)
 
         if custom_result
@@ -138,10 +142,14 @@ module HashDiff
       end
 
       # recursive comparison for common keys
-      common_keys.sort.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => "#{prefix}#{k}"))) }
+      common_keys.sort.each do |k|
+         break if options.include?(:max_diff_count) and result.count > options[:max_diff_count]
+         result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => "#{prefix}#{k}")))
+      end
 
       # added properties
       added_keys.sort.each do |k|
+        break if options.include?(:max_diff_count) and result.count > options[:max_diff_count]
         unless obj1.key?(k)
           custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, obj2[k])
 
@@ -175,11 +183,13 @@ module HashDiff
       return []
     elsif a.size == 0
       b.each_index do |index|
+        break if options.include?(:max_diff_count) and change_set.count > options[:max_diff_count]
         change_set << ['+', index, b[index]]
       end
       return change_set
     elsif b.size == 0
       a.each_index do |index|
+        break if options.include?(:max_diff_count) and change_set.count > options[:max_diff_count]
         i = a.size - index - 1
         change_set << ['-', i, a[i]]
       end
@@ -201,11 +211,13 @@ module HashDiff
 
       # remove from a, beginning from the end
       (x > last_x + 1) and (x - last_x - 2).downto(0).each do |i|
+        break if options.include?(:max_diff_count) and change_set.count > options[:max_diff_count]
         change_set << ['-', last_y + i + 1, a[i + last_x + 1]]
       end
 
       # add from b, beginning from the head
       (y > last_y + 1) and 0.upto(y - last_y - 2).each do |i|
+        break if options.include?(:max_diff_count) and change_set.count > options[:max_diff_count]
         change_set << ['+', last_y + i + 1, b[i + last_y + 1]]
       end
 
