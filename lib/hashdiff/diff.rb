@@ -76,7 +76,7 @@ module HashDiff
       :delimiter   =>   '.',
       :strict      =>   true,
       :strip       =>   false,
-      :numeric_tolerance => 0,
+      :numeric_tolerance => 0
     }.merge!(options)
 
     opts[:comparison] = block if block_given?
