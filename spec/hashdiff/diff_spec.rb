@@ -22,6 +22,26 @@ describe HashDiff do
     diff.should == []
   end
 
+  it "should be able to diff two equal hashes with mixed key types" do
+    a = { 'a' => 1, :b => 1 }
+    diff = HashDiff.diff(a, a)
+    diff.should == []
+  end
+
+  it "should be able to diff if mixed key types are removed" do
+    a = { 'a' => 1, :b => 1 }
+    b = {}
+    diff = HashDiff.diff(a, b)
+    diff.should == [["-", "a", 1], ["-", "b", 1]]
+  end
+
+  it "should be able to diff if mixed key types are added" do
+    a = { 'a' => 1, :b => 1 }
+    b = {}
+    diff = HashDiff.diff(b, a)
+    diff.should == [["+", "a", 1], ["+", "b", 1]]
+  end
+
   it "should be able to diff two hashes with equivalent numerics, when strict is false" do
     diff = HashDiff.diff({ 'a' => 2.0, 'b' => 2 }, { 'a' => 2, 'b' => 2.0 }, :strict => false)
     diff.should == []
