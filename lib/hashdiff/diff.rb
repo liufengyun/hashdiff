@@ -127,7 +127,7 @@ module HashDiff
       added_keys = obj2.keys - obj1.keys
 
       # add deleted properties
-      deleted_keys.sort.each do |k|
+      deleted_keys.sort_by{|k,v| k.to_s }.each do |k|
         custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", obj1[k], nil)
 
         if custom_result
@@ -138,10 +138,10 @@ module HashDiff
       end
 
       # recursive comparison for common keys
-      common_keys.sort.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => "#{prefix}#{k}"))) }
+      common_keys.sort_by{|k,v| k.to_s }.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => "#{prefix}#{k}"))) }
 
       # added properties
-      added_keys.sort.each do |k|
+      added_keys.sort_by{|k,v| k.to_s }.each do |k|
         unless obj1.key?(k)
           custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, obj2[k])
 
