@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.1 2016-11-24
+
+* fix an error when a hash has mixed types #26
+
 ## v0.3.0 2016-2-11
 
 * support `:case_insensitive` option
