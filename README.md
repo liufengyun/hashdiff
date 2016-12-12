@@ -108,7 +108,7 @@ In cases where you have similar hash objects in arrays, you can pass a custom va
 
 #### `:strict`
 
-The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, a Fixnum will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
+The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, an Integer will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
 
 #### `:numeric_tolerance`
 
