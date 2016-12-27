@@ -23,13 +23,13 @@ module HashDiff
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Fixnum)
+        if last_part.is_a?(Integer)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Fixnum)
+        if last_part.is_a?(Integer)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
@@ -62,13 +62,13 @@ module HashDiff
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Fixnum)
+        if last_part.is_a?(Integer)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Fixnum)
+        if last_part.is_a?(Integer)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]
