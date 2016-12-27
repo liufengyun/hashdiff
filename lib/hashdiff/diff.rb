@@ -7,7 +7,7 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
@@ -48,7 +48,7 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
   #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
