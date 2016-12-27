@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.2 2016-12-27
+
+* replace `Fixnum` by `Integer` #28
+
 ## v0.3.1 2016-11-24
 
 * fix an error when a hash has mixed types #26
