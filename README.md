@@ -102,6 +102,28 @@ diff = HashDiff.diff(a, b, :delimiter => '\t')
 diff.should == [['-', 'a\tx', 2], ['-', 'a\tz', 4], ['-', 'b\tx', 3], ['~', 'b\tz', 45, 30], ['+', 'b\ty', 3]]
 ```
 
+You can also disable delimiters by passing `false`, and paths will be returned as an array:
+
+```ruby
+a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
+b = {a:{y:3}, b:{y:3, z:30}}
+
+diff = HashDiff.diff(a, b, :delimiter => false)
+diff.should == [['-', ['a', 'x'], 2], ['-', ['a', 'z'], 4], ['-', ['b', 'x'], 3], ['~', ['b', 'z'], 45, 30], ['+', ['b', 'y'], 3]]
+```
+
+#### `:stringify_keys`
+
+By default, object keys are converted to strings in paths, you can override this behavior by specifying `:stringify_keys` as `false`.  This only works when `:delimiter` is false.
+
+```ruby
+a = {'a' => 1}
+b = {'a' => 1, :b => 2}
+
+diff = HashDiff.diff(a, b, :delimiter => false, :stringify_keys => false)
+diff.should == [['+', [:b], 2]]
+```
+
 #### `:similarity`
 
 In cases where you have similar hash objects in arrays, you can pass a custom value for `:similarity` instead of the default `0.8`.  This is interpreted as a ratio of similarity (default is 80% similar, whereas `:similarity => 0.5` would look for at least a 50% similarity).

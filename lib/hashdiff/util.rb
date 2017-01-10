@@ -8,7 +8,7 @@ module HashDiff
 
     count_a = count_nodes(a)
     count_b = count_nodes(b)
-    diffs = count_diff diff(a, b, opts)
+    diffs = count_diff diff_internal(a, b, opts)
 
     if count_a + count_b == 0
       return true
@@ -48,12 +48,25 @@ module HashDiff
 
   # @private
   #
-  # decode property path into an array
+  # encode an array into a property path
+  # @param [String] path Property-string
+  # @param [String] delimiter Property-string delimiter
+  #
+  # e.g. ['a', 'b', 3, 'c'] => "a.b[3].c"
+  def self.encode_property_path(path, delimiter)
+    path.inject('') do |acc, x|
+      acc << (x.is_a?(Integer) ? "[#{x == -1 ? '*' : x}]" : "#{acc.length == 0 ? '' : delimiter}#{x}")
+    end
+  end
+
+  # @private
+  #
+  # decode a property path into an array
   # @param [String] path Property-string
   # @param [String] delimiter Property-string delimiter
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
-  def self.decode_property_path(path, delimiter='.')
+  def self.decode_property_path(path, delimiter)
     parts = path.split(delimiter).collect do |part|
       if part =~ /^(.*)\[(\d+)\]$/
         if $1.size > 0
@@ -116,13 +129,14 @@ module HashDiff
   # @private
   #
   # try custom comparison
-  def self.custom_compare(method, key, obj1, obj2)
-    if method
-      res = method.call(key, obj1, obj2)
+  def self.custom_compare(options, path, obj1, obj2)
+    if options[:comparison]
+      user_path = options[:delimiter] ? encode_property_path(path, options[:delimiter]) : path
+      res = options[:comparison].call(user_path, obj1, obj2)
 
       # nil != false here
       if res == false
-        return [['~', key, obj1, obj2]]
+        return [['~', path, obj1, obj2]]
       elsif res == true
         return []
       end

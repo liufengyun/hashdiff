@@ -3,10 +3,8 @@ module HashDiff
   #
   # caculate array difference using LCS algorithm
   # http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
-  def self.lcs(a, b, options = {})
-    opts = { :similarity => 0.8 }.merge!(options)
-
-    opts[:prefix] = "#{opts[:prefix]}[*]"
+  def self.lcs(a, b, options)
+    options = options.merge({:prefix => options[:prefix] + [-1]})
 
     return [] if a.size == 0 or b.size == 0
 
@@ -19,7 +17,7 @@ module HashDiff
     (b_start..b_finish).each do |bi|
       lcs[bi] = [] 
       (a_start..a_finish).each do |ai|
-        if similar?(a[ai], b[bi], opts)
+        if similar?(a[ai], b[bi], options)
           topleft = (ai > 0 and bi > 0)? lcs[bi-1][ai-1][1] : 0
           lcs[bi][ai] = [:topleft, topleft + 1]
         elsif

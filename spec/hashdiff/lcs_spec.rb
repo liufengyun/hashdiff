@@ -5,7 +5,7 @@ describe HashDiff do
     a = [1, 2, 3]
     b = [1, 2, 3]
 
-    lcs = HashDiff.lcs(a, b)
+    lcs = HashDiff.lcs(a, b, :prefix => [], :similarity => 0.8)
     lcs.should == [[0, 0], [1, 1], [2, 2]]
   end
 
@@ -13,7 +13,7 @@ describe HashDiff do
     a = [1.05, 2, 3.25]
     b = [1.06, 2, 3.24]
 
-    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1)
+    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1, :prefix => [], :similarity => 0.8)
     lcs.should == [[0, 0], [1, 1], [2, 2]]
   end
 
@@ -21,7 +21,7 @@ describe HashDiff do
     a = ['foo', 'bar', 'baz']
     b = [' foo', 'bar', 'zab']
 
-    lcs = HashDiff.lcs(a, b, :strip => true)
+    lcs = HashDiff.lcs(a, b, :strip => true, :prefix => [], :similarity => 0.8)
     lcs.should == [[0, 0], [1, 1]]
   end
 
@@ -29,7 +29,7 @@ describe HashDiff do
     a = [1, 2, 3]
     b = [1, 8, 7]
 
-    lcs = HashDiff.lcs(a, b)
+    lcs = HashDiff.lcs(a, b, :prefix => [], :similarity => 0.8)
     lcs.should == [[0, 0]]
   end
 
@@ -37,7 +37,7 @@ describe HashDiff do
     a = [1, 3, 5, 7]
     b = [2, 3, 7, 5]
 
-    lcs = HashDiff.lcs(a, b)
+    lcs = HashDiff.lcs(a, b, :prefix => [], :similarity => 0.8)
     lcs.should == [[1, 1], [2, 3]]
   end
 
@@ -45,7 +45,7 @@ describe HashDiff do
     a = [1, 3.05, 5, 7]
     b = [2, 3.06, 7, 5]
 
-    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1)
+    lcs = HashDiff.lcs(a, b, :numeric_tolerance => 0.1, :prefix => [], :similarity => 0.8)
     lcs.should == [[1, 1], [2, 3]]
   end
 
@@ -53,7 +53,7 @@ describe HashDiff do
     a = [1, 3, 4, 7]
     b = [2, 3, 7, 5]
 
-    lcs = HashDiff.lcs(a, b)
+    lcs = HashDiff.lcs(a, b, :prefix => [], :similarity => 0.8)
     lcs.should == [[1, 1], [3, 2]]
   end
 
@@ -68,7 +68,7 @@ describe HashDiff do
           {"value" => "Close", "onclick" => "CloseDoc()"}
         ]
 
-    lcs = HashDiff.lcs(a, b, :similarity => 0.5)
+    lcs = HashDiff.lcs(a, b, :similarity => 0.5, :prefix => [])
     lcs.should == [[0, 0], [1, 2]]
   end
 end

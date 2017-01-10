@@ -163,6 +163,51 @@ describe HashDiff do
     diff.should == [["-", "[0]\td", 4], ["-", "[1]", {"x"=>5, "y"=>6, "z"=>3}]]
   end
 
+  context 'when :delimiter is false' do
+    it "should return an array path for a simple object" do
+      a = {'a' => 1}
+      b = {'a' => 1, 'b' => 2}
+      diff = HashDiff.diff(a, b, :delimiter => false)
+      diff.should == [['+', ['b'], 2]]
+    end
+
+    it "should return an array path for an object nested in an object" do
+      a = {'subobj' => {'a' => 1}}
+      b = {'subobj' => {'a' => 1, 'b' => 2}}
+      diff = HashDiff.diff(a, b, :delimiter => false)
+      diff.should == [['+', ['subobj', 'b'], 2]]
+    end
+
+    it "should return an array path for an object nested in an array" do
+      a = [{'a' => 1}]
+      b = [{'a' => 1, 'b' => 2}]
+      diff = HashDiff.diff(a, b, :delimiter => false)
+      diff.should == [['-', [0], {'a' => 1}], ['+', [0], {'a' => 1, 'b' => 2}]]
+    end
+
+    it "should return an array path for an array nested in an array" do
+      a = [[1]]
+      b = [[1, 2]]
+      diff = HashDiff.diff(a, b, :delimiter => false)
+      diff.should == [['-', [0], [1]], ['+', [0], [1, 2]]]
+    end
+
+    context 'when :stringify_keys is false' do
+      it "preserves symbol keys" do
+        a = {'a' => 1}
+        b = {'a' => 1, :b => 2}
+        diff = HashDiff.diff(a, b, :delimiter => false, :stringify_keys => false)
+        diff.should == [['+', [:b], 2]]
+      end
+      it "preserves object keys" do
+        a = {'a' => 1}
+        b = {'a' => 1, ['foo', 'bar'] => 2}
+        diff = HashDiff.diff(a, b, :delimiter => false, :stringify_keys => false)
+        diff.should == [['+', [['foo', 'bar']], 2]]
+      end
+    end
+  end
+
   context 'when :numeric_tolerance requested' do
     it "should be able to diff changes in hash value" do
       a = {'a' => 0.558, 'b' => 0.0, 'c' => 0.65, 'd' => 'fin'}
