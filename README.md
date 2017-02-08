@@ -2,6 +2,10 @@
 
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
+It also supports comparing two arrays.
+
+HashDiff does not monkey-patch any existing class. All features are contained inside the `HashDiff` module.
+
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 ## Why HashDiff?
