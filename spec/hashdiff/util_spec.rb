@@ -1,22 +1,6 @@
 require 'spec_helper'
 
 describe HashDiff do
-  it "should be able to encode property path with dot delimiter" do
-    encoded = HashDiff.send(:encode_property_path, ['a', 'b', 0, 'c', 'city', 5], '.')
-    encoded.should == "a.b[0].c.city[5]"
-  end
-
-  it "should be able to encode property path with tab delimiter" do
-    encoded = HashDiff.send(:encode_property_path, ['a', 'b', 0, 'c', 'city', 5], "\t")
-    encoded.should == "a\tb[0]\tc\tcity[5]"
-  end
-
-  # -1 is used internally for custom comparison callback paths in an array
-  it "should encode property path with -1 into a *" do
-    encoded = HashDiff.send(:encode_property_path, ['a', -1, 'b', 0], '.')
-    encoded.should == "a[*].b[0]"
-  end
-
   it "should be able to decode property path with dot delimiter" do
     decoded = HashDiff.send(:decode_property_path, "a.b[0].c.city[5]", '.')
     decoded.should == ['a', 'b', 0, 'c', 'city', 5]

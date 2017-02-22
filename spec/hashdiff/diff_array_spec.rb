@@ -55,12 +55,5 @@ describe HashDiff do
     diff = HashDiff.diff_array(a, b, :prefix => [])
     diff.should == [['+', [0], 1], ['-', [2], 3]]
   end
-
-  it "should return an array path if requested" do
-    a = [1, 2, 3]
-    b = [2, 3, 4]
-    diff = HashDiff.diff_array(a, b, :prefix => [], :delimiter => false)
-    diff.should == [['-', [0], 1], ['+', [2], 4]]
-  end
 end
 

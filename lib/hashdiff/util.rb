@@ -48,19 +48,6 @@ module HashDiff
 
   # @private
   #
-  # encode an array into a property path
-  # @param [String] path Property-string
-  # @param [String] delimiter Property-string delimiter
-  #
-  # e.g. ['a', 'b', 3, 'c'] => "a.b[3].c"
-  def self.encode_property_path(path, delimiter)
-    path.inject('') do |acc, x|
-      acc << (x.is_a?(Integer) ? "[#{x == -1 ? '*' : x}]" : "#{acc.length == 0 ? '' : delimiter}#{x}")
-    end
-  end
-
-  # @private
-  #
   # decode a property path into an array
   # @param [String] path Property-string
   # @param [String] delimiter Property-string delimiter
@@ -131,8 +118,7 @@ module HashDiff
   # try custom comparison
   def self.custom_compare(options, path, obj1, obj2)
     if options[:comparison]
-      user_path = options[:delimiter] ? encode_property_path(path, options[:delimiter]) : path
-      res = options[:comparison].call(user_path, obj1, obj2)
+      res = options[:comparison].call(path, obj1, obj2)
 
       # nil != false here
       if res == false

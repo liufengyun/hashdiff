@@ -8,7 +8,6 @@ module HashDiff
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
   #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
-  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references, or false to use array paths
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #   * :stringify_keys [true] whether or not to convert object keys to strings
@@ -52,7 +51,6 @@ module HashDiff
   # @param [Hash] options the options to use when comparing
   #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
   #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
-  #   * :delimiter (String) ['.'] the delimiter used when returning nested key references, or nil to use array paths
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #   * :stringify_keys [true] whether or not to convert object keys to strings
@@ -74,25 +72,15 @@ module HashDiff
     options = {
       :prefix      =>   [],
       :similarity  =>   0.8,
-      :delimiter   =>   '.',
       :strict      =>   true,
       :strip       =>   false,
       :stringify_keys => true,
       :numeric_tolerance => 0
     }.merge!(options)
 
-    options[:stringify_keys] = true if options[:delimiter]
     options[:comparison] = block if block_given?
 
-    change_set = diff_internal(obj1, obj2, options)
-
-    if options[:delimiter]
-      change_set.each do |change|
-        change[1] = encode_property_path(change[1], options[:delimiter])
-      end
-    else
-      change_set
-    end
+    diff_internal(obj1, obj2, options)
   end
 
   # @private

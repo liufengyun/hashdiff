@@ -6,15 +6,7 @@ describe HashDiff do
     b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
 
     diff = HashDiff.best_diff(a, b)
-    diff.should == [["-", "x[0].c", 3], ["+", "x[0].b", 2], ["-", "x[1]", {"y"=>3}]]
-  end
-
-  it "should use custom delimiter when provided" do
-    a = {'x' => [{'a' => 1, 'c' => 3, 'e' => 5}, {'y' => 3}]}
-    b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
-
-    diff = HashDiff.best_diff(a, b, :delimiter => "\t")
-    diff.should == [["-", "x[0]\tc", 3], ["+", "x[0]\tb", 2], ["-", "x[1]", {"y"=>3}]]
+    diff.should == [["-", ["x", 0, "c"], 3], ["+", ["x", 0, "b"], 2], ["-", ["x", 1], {"y"=>3}]]
   end
 
   it "should use custom comparison when provided" do
@@ -22,13 +14,12 @@ describe HashDiff do
     b = {'x' => [{'a' => 'bar', 'b' => 'cow', 'e' => 'puppy'}] }
 
     diff = HashDiff.best_diff(a, b) do |path, obj1, obj2|
-      case path
-      when /^x\[.\]\..$/
+      if path.length == 3
         obj1.length == obj2.length if obj1 and obj2
       end
     end
 
-    diff.should == [["-", "x[0].c", 'goat'], ["+", "x[0].b", 'cow'], ["-", "x[1]", {"y"=>'baz'}]]
+    diff.should == [["-", ["x", 0, "c"], 'goat'], ["+", ["x", 0, "b"], 'cow'], ["-", ["x", 1], {"y"=>'baz'}]]
   end
 
   it "should be able to best diff array in hash" do
@@ -57,9 +48,9 @@ describe HashDiff do
 
     diff = HashDiff.best_diff(a, b)
     diff.should == [
-      ['~', 'menu.id', 'file', 'file 2'],
-      ['~', 'menu.popup.menuitem[0].value', 'New', 'New1'],
-      ['+', 'menu.popup.menuitem[1]', {"value" => "Open", "onclick" => "OpenDoc()"}]
+      ['~', ['menu', 'id'], 'file', 'file 2'],
+      ['~', ['menu', 'popup', 'menuitem', 0, 'value'], 'New', 'New1'],
+      ['+', ['menu', 'popup', 'menuitem', 1], {"value" => "Open", "onclick" => "OpenDoc()"}]
     ]
   end
 end
