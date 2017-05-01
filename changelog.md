@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.4 2017-05-01
+
+* performance improvement of HashDiff#similar? #31
+
 ## v0.3.2 2016-12-27
 
 * replace `Fixnum` by `Integer` #28
