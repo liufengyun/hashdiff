@@ -99,6 +99,11 @@ module HashDiff
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
+    if opts.fetch(:sort, false)
+      obj1 = sort(obj1)
+      obj2 = sort(obj2)
+    end
+
     result = []
     if obj1.is_a?(Array)
       changeset = diff_array(obj1, obj2, opts) do |lcs|
