@@ -1,3 +1,40 @@
+class Object
+  def count_nodes
+    1
+  end
+end
+
+class Array
+  def count_nodes
+    count = 0
+
+    self.each do |e|
+      if e
+        count += e.count_nodes
+      end
+    end
+
+    count
+  end
+end
+
+class Hash
+  def count_nodes
+    return @hd_node_count unless @hd_node_count.nil?
+
+    count = 0
+
+    self.each do |k, v|
+      if v
+        count += v.count_nodes
+      end
+    end
+
+    @hd_node_count = count
+    count
+  end
+end
+
 module HashDiff
 
   # @private
@@ -34,17 +71,7 @@ module HashDiff
   # count total nodes for an object
   def self.count_nodes(obj)
     return 0 unless obj
-
-    count = 0
-    if obj.is_a?(Array)
-      obj.each {|e| count += count_nodes(e) }
-    elsif obj.is_a?(Hash)
-      obj.each {|k, v| count += count_nodes(v) }
-    else
-      return 1
-    end
-
-    count
+    obj.count_nodes
   end
 
   # @private
