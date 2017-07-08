@@ -145,17 +145,4 @@ describe HashDiff do
     HashDiff.unpatch!(b, diff).should == a
   end
 
-  it "should be able to patch hash value removal with custom delimiter" do
-    a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
-    b = {"a" => 1, "b" => {"b1" => 3} }
-    diff = HashDiff.diff(a, b, :delimiter => "\n")
-
-    HashDiff.patch!(a, diff, :delimiter => "\n").should == b
-
-    a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
-    b = {"a" => 1, "b" => {"b1" => 3} }
-    HashDiff.unpatch!(b, diff, :delimiter => "\n").should == a
-  end
-
-
 end

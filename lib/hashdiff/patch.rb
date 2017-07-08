@@ -6,9 +6,11 @@ module HashDiff
   # Apply patch to object
   #
   # @param [Hash, Array] obj the object to be patched, can be an Array or a Hash
-  # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  # @param [Array] changes with either string paths or array paths:
+  #   [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  #   [[ '+', ['a', 'b'], '45' ], [ '-', ['a', 'c'], '5' ], [ '~', ['a', 'x'], '45', '63']]
   # @param [Hash] options supports following keys:
-  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array
+  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array, ignored for array paths
   #
   # @return the object after patch
   #
@@ -17,19 +19,19 @@ module HashDiff
     delimiter = options[:delimiter] || '.'
 
     changes.each do |change|
-      parts = decode_property_path(change[1], delimiter)
+      parts = change[1].is_a?(Array) ? change[1] : decode_property_path(change[1], delimiter)
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Integer)
+        if parent_node.is_a?(Array)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Integer)
+        if parent_node.is_a?(Array)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
@@ -45,9 +47,11 @@ module HashDiff
   # Unpatch an object
   #
   # @param [Hash, Array] obj the object to be unpatched, can be an Array or a Hash
-  # @param [Array] changes e.g. [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  # @param [Array] changes with either string paths or array paths:
+  #   [[ '+', 'a.b', '45' ], [ '-', 'a.c', '5' ], [ '~', 'a.x', '45', '63']]
+  #   [[ '+', ['a', 'b'], '45' ], [ '-', ['a', 'c'], '5' ], [ '~', ['a', 'x'], '45', '63']]
   # @param [Hash] options supports following keys:
-  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array
+  #   * :delimiter (String) ['.'] delimiter string for representing nested keys in changes array, ignored for array paths
   #
   # @return the object after unpatch
   #
@@ -56,19 +60,19 @@ module HashDiff
     delimiter = options[:delimiter] || '.'
 
     changes.reverse_each do |change|
-      parts = decode_property_path(change[1], delimiter)
+      parts = change[1].is_a?(Array) ? change[1] : decode_property_path(change[1], delimiter)
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Integer)
+        if parent_node.is_a?(Array)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Integer)
+        if parent_node.is_a?(Array)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]
