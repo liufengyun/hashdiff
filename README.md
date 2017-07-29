@@ -72,8 +72,8 @@ diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-
 patch example:
 
 ```ruby
-a = {a: 3}
-b = {a: {a1: 1, a2: 2}}
+a = {'a' => 3}
+b = {'a' => {'a1' => 1, 'a2' => 2}}
 
 diff = HashDiff.diff(a, b)
 HashDiff.patch!(a, diff).should == b
@@ -82,8 +82,8 @@ HashDiff.patch!(a, diff).should == b
 unpatch example:
 
 ```ruby
-a = [{a: 1, b: 2, c: 3, d: 4, e: 5}, {x: 5, y: 6, z: 3}, 1]
-b = [1, {a: 1, b: 2, c: 3, e: 5}]
+a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 1]
+b = [1, {'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}]
 
 diff = HashDiff.diff(a, b) # diff two array is OK
 HashDiff.unpatch!(b, diff).should == a
