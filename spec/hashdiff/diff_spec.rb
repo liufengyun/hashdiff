@@ -274,4 +274,40 @@ describe HashDiff do
       diff.should == [['~', 'b', 'boat', 'truck'], ['~', 'c', 'plane', ' plan']]
     end
   end
+
+  context 'when :array_path is true' do
+    it 'should return the diff path in an array rather than a string' do
+      x = { 'a' => 'foo' }
+      y = { 'a' => 'bar' }
+      diff = HashDiff.diff(x, y, :array_path => true)
+
+      diff.should == [['~', ['a'], 'foo', 'bar']]
+    end
+
+    it 'should show array indexes in paths' do
+      x = { 'a' => [0, 1, 2] }
+      y = { 'a' => [0, 1, 2, 3] }
+
+      diff = HashDiff.diff(x, y, :array_path => true)
+
+      diff.should == [['+', ['a', 3], 3]]
+    end
+
+    it 'should show differences with string and symbol keys' do
+      x = { 'a' => 'foo' }
+      y = { :a => 'bar' }
+
+      diff = HashDiff.diff(x, y, :array_path => true)
+      diff.should == [['-', ['a'], 'foo'], ['+', [:a], 'bar']]
+    end
+
+    it 'should support other key types' do
+      time = Time.now
+      x = { time => 'foo' }
+      y = { 0 => 'bar' }
+
+      diff = HashDiff.diff(x, y, :array_path => true)
+      diff.should == [['-', [time], 'foo'], ['+', [0], 'bar']]
+    end
+  end
 end

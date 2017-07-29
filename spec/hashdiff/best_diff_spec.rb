@@ -62,4 +62,13 @@ describe HashDiff do
       ['+', 'menu.popup.menuitem[1]', {"value" => "Open", "onclick" => "OpenDoc()"}]
     ]
   end
+
+  it "should be able to have an array_path specified" do
+    a = {'x' => [{'a' => 1, 'c' => 3, 'e' => 5}, {'y' => 3}]}
+    b = {'x' => [{'a' => 1, 'b' => 2, 'e' => 5}] }
+
+    diff = HashDiff.best_diff(a, b, :array_path => true)
+    diff.should == [["-", ["x", 0, "c"], 3], ["+", ["x", 0, "b"], 2], ["-", ["x", 1], {"y"=>3}]]
+  end
+
 end

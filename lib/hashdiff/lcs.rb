@@ -6,7 +6,7 @@ module HashDiff
   def self.lcs(a, b, options = {})
     opts = { :similarity => 0.8 }.merge!(options)
 
-    opts[:prefix] = "#{opts[:prefix]}[*]"
+    opts[:prefix] = prefix_append_array_index(opts[:prefix], '*', opts)
 
     return [] if a.size == 0 or b.size == 0
 
