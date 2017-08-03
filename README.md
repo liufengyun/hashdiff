@@ -141,7 +141,7 @@ diff.should == [["~", "x", 5, 6]]
 
 #### `:case_insensitive`
 
-The :case_insensitive option makes string comparisions ignore case.
+The :case_insensitive option makes string comparisons ignore case.
 
 ```ruby
 a = {x:5, s:'FooBar'}
