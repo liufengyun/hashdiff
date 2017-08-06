@@ -72,8 +72,8 @@ diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-
 patch example:
 
 ```ruby
-a = {a: 3}
-b = {a: {a1: 1, a2: 2}}
+a = {'a' => 3}
+b = {'a' => {'a1' => 1, 'a2' => 2}}
 
 diff = HashDiff.diff(a, b)
 HashDiff.patch!(a, diff).should == b
@@ -82,8 +82,8 @@ HashDiff.patch!(a, diff).should == b
 unpatch example:
 
 ```ruby
-a = [{a: 1, b: 2, c: 3, d: 4, e: 5}, {x: 5, y: 6, z: 3}, 1]
-b = [1, {a: 1, b: 2, c: 3, e: 5}]
+a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 1]
+b = [1, {'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}]
 
 diff = HashDiff.diff(a, b) # diff two array is OK
 HashDiff.unpatch!(b, diff).should == a
@@ -91,8 +91,9 @@ HashDiff.unpatch!(b, diff).should == a
 
 ### Options
 
-There are six options available: `:delimiter`, `:similarity`,
-`:strict`, `:numeric_tolerance`, `:strip` and `:case_insensitive`.
+There are seven options available: `:delimiter`, `:similarity`,
+`:strict`, `:numeric_tolerance`, `:strip`, `:case_insensitive`
+and `:array_path`.
 
 #### `:delimiter`
 
@@ -140,7 +141,7 @@ diff.should == [["~", "x", 5, 6]]
 
 #### `:case_insensitive`
 
-The :case_insensitive option makes string comparisions ignore case.
+The :case_insensitive option makes string comparisons ignore case.
 
 ```ruby
 a = {x:5, s:'FooBar'}
@@ -148,6 +149,39 @@ b = {x:6, s:'foobar'}
 
 diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
 diff.should == [["~", "x", 5, 6]]
+```
+
+#### `:array_path`
+
+The :array_path option represents the path of the diff in an array rather than
+a string. This can be used to show differences in between hash key types and
+is useful for `patch!` when used on hashes without string keys.
+
+```ruby
+a = {x:5}
+b = {'x'=>6}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [['-', [:x], 5], ['+', ['x'], 6]]
+```
+
+For cases where there are arrays in paths their index will be added to the path.
+```ruby
+a = {x:[0,1]}
+b = {x:[0,2]}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [["-", [:x, 1], 1], ["+", [:x, 1], 2]]
+```
+
+This shouldn't cause problems if you are comparing an array with a hash:
+
+```ruby
+a = {x:{0=>1}}
+b = {x:[1]}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [["~", [:a], [1], {0=>1}]]
 ```
 
 #### Specifying a custom comparison method
@@ -185,6 +219,8 @@ diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-",
 ```
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
+
+When used in conjunction with the `array_path` option, the path passed in as an argument will be an array. When determining the ordering of an array a key of `"*"` will be used in place of the `key[*]` field. It is possible, if you have hashes with integer or `"*"` keys, to have problems distinguishing between arrays and hashes - although this shouldn't be an issue unless your data is very difficult to predict and/or your custom rules are very specific.
 
 #### Sorting arrays before comparison
 

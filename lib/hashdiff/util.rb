@@ -55,19 +55,17 @@ module HashDiff
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
   def self.decode_property_path(path, delimiter='.')
-    parts = path.split(delimiter).collect do |part|
+    path.split(delimiter).inject([]) do |memo, part|
       if part =~ /^(.*)\[(\d+)\]$/
         if $1.size > 0
-          [$1, $2.to_i]
+          memo + [$1, $2.to_i]
         else
-          $2.to_i
+          memo + [$2.to_i]
         end
       else
-        part
+        memo + [part]
       end
     end
-
-    parts.flatten
   end
 
   # @private
@@ -127,6 +125,22 @@ module HashDiff
       elsif res == true
         return []
       end
+    end
+  end
+
+  def self.prefix_append_key(prefix, key, opts)
+    if opts[:array_path]
+      prefix + [key]
+    else
+      prefix.empty? ? "#{key}" : "#{prefix}#{opts[:delimiter]}#{key}"
+    end
+  end
+
+  def self.prefix_append_array_index(prefix, array_index, opts)
+    if opts[:array_path]
+      prefix + [array_index]
+    else
+      "#{prefix}[#{array_index}]"
     end
   end
 end

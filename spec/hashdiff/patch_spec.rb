@@ -157,5 +157,27 @@ describe HashDiff do
     HashDiff.unpatch!(b, diff, :delimiter => "\n").should == a
   end
 
+  it "should be able to patch when the diff is generated with an array_path" do
+    a = {"a" => 1, "b" => 1}
+    b = {"a" => 1, "b" => 2}
+    diff = HashDiff.diff(a, b, :array_path => true)
 
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, "b" => 1}
+    b = {"a" => 1, "b" => 2}
+    HashDiff.unpatch!(b, diff).should == a
+  end
+
+  it "should be able to use non string keys when diff is generated with an array_path" do
+    a = {"a" => 1, :a => 2, 0 => 3}
+    b = {"a" => 5, :a => 6, 0 => 7}
+    diff = HashDiff.diff(a, b, :array_path => true)
+
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, :a => 2, 0 => 3}
+    b = {"a" => 5, :a => 6, 0 => 7}
+    HashDiff.unpatch!(b, diff).should == a
+  end
 end
