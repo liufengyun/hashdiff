@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.5 2017-08-06
+
+* add option `array_path` #34
+
 ## v0.3.4 2017-05-01
 
 * performance improvement of HashDiff#similar? #31
