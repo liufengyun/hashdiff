@@ -3,5 +3,4 @@ gemspec
 
 group :test do
   gem 'rake', '< 11'
-  gem 'codecov'
 end
