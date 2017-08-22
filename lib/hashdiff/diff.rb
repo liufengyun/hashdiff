@@ -77,7 +77,8 @@ module HashDiff
       :strict      =>   true,
       :strip       =>   false,
       :numeric_tolerance => 0,
-      :array_path  =>   false
+      :array_path  =>   false,
+      :use_lcs     =>   true
     }.merge!(options)
 
     opts[:prefix] = [] if opts[:array_path] && opts[:prefix] == ''
@@ -105,8 +106,8 @@ module HashDiff
     end
 
     result = []
-    if obj1.is_a?(Array)
-      changeset = diff_array(obj1, obj2, opts) do |lcs|
+    if obj1.is_a?(Array) && opts[:use_lcs]
+      changeset = diff_array_lcs(obj1, obj2, opts) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
           prefix = prefix_append_array_index(opts[:prefix], pair[0], opts)
@@ -122,6 +123,8 @@ module HashDiff
           result << ['+', change_key, change[2]]
         end
       end
+    elsif obj1.is_a?(Array) && !opts[:use_lcs]
+      result.concat(LinearCompareArray.call(obj1, obj2, opts))
     elsif obj1.is_a?(Hash)
 
       deleted_keys = obj1.keys - obj2.keys
@@ -170,7 +173,7 @@ module HashDiff
   # @private
   #
   # diff array using LCS algorithm
-  def self.diff_array(a, b, options = {})
+  def self.diff_array_lcs(a, b, options = {})
     opts = {
       :prefix      =>   '',
       :similarity  =>   0.8,
@@ -223,5 +226,4 @@ module HashDiff
 
     change_set
   end
-
 end
