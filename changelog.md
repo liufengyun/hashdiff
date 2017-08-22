@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.6 2017-08-22
+
+* add option `use_lcs` #35
+
 ## v0.3.5 2017-08-06
 
 * add option `array_path` #34
