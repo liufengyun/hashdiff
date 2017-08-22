@@ -310,4 +310,30 @@ describe HashDiff do
       diff.should == [['-', [time], 'foo'], ['+', [0], 'bar']]
     end
   end
+
+  context 'when :use_lcs is false' do
+    it 'should show items in an array as changed' do
+      x = [:a, :b]
+      y = [:c, :d]
+      diff = HashDiff.diff(x, y, :use_lcs => false)
+
+      diff.should == [['~', '[0]', :a, :c], ['~', '[1]', :b, :d]]
+    end
+
+    it 'should show additions to arrays' do
+      x = { :a => [0] }
+      y = { :a => [0, 1] }
+      diff = HashDiff.diff(x, y, :use_lcs => false)
+
+      diff.should == [['+', 'a[1]', 1]]
+    end
+
+    it 'shows changes to nested arrays' do
+      x = { :a => [[0, 1]] }
+      y = { :a => [[1, 2]] }
+      diff = HashDiff.diff(x, y, :use_lcs => false)
+
+      diff.should == [['~', 'a[0][0]', 0, 1], ['~', 'a[0][1]', 1, 2]]
+    end
+  end
 end
