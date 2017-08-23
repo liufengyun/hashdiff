@@ -91,9 +91,9 @@ HashDiff.unpatch!(b, diff).should == a
 
 ### Options
 
-There are seven options available: `:delimiter`, `:similarity`,
-`:strict`, `:numeric_tolerance`, `:strip`, `:case_insensitive`
-and `:array_path`.
+There are eight options available: `:delimiter`, `:similarity`,
+`:strict`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path`
+and `:use_lcs`
 
 #### `:delimiter`
 
@@ -182,6 +182,28 @@ b = {x:[1]}
 
 diff = HashDiff.diff(a, b, :array_path => true)
 diff.should == [["~", [:a], [1], {0=>1}]]
+```
+
+#### `:use_lcs`
+
+The :use_lcs option is used to specify whether a
+[Longest common subsequence](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem)
+(LCS) algorithm is used to determine differences in arrays. This defaults to
+`true` but can be changed to `false` for significantly faster array comparisons
+(O(n) complexity rather than O(n<sup>2</sup>) for LCS).
+
+When :use_lcs is false the results of array comparisons have a tendency to
+show changes at indexes rather than additions and subtractions when :use_lcs is
+true.
+
+Note, currently the :similarity option has no effect when :use_lcs is false.
+
+```ruby
+a = {x: [0, 1, 2]}
+b = {x: [0, 2, 2, 3]}
+
+diff = HashDiff.diff(a, b, :use_lcs => false)
+diff.should == [["~", "x[1]", 1, 2], ["+", "x[3]", 3]]
 ```
 
 #### Specifying a custom comparison method
