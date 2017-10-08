@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.7 2017-10-08
+
+* remove 1.8.7 support from gemspec #39
+
 ## v0.3.6 2017-08-22
 
 * add option `use_lcs` #35
