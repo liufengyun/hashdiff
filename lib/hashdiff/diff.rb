@@ -92,6 +92,9 @@ module HashDiff
     result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
     return result if result
 
+    obj1 = nil if (obj1.is_a?(String) && obj1.strip.empty?)
+    obj2 = nil if (obj2.is_a?(String) && obj2.strip.empty?)
+
     if obj1.nil? and obj2.nil?
       return []
     end
