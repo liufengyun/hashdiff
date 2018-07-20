@@ -7,6 +7,8 @@ module HashDiff
     if(a.is_a?(Hash) && b.is_a?(Hash) && a["id"].present? && b["id"].present?)
       return a["id"] == b["id"]
     end
+
+    return compare_values(a, b, options) unless a.is_a?(Array) || a.is_a?(Hash) || b.is_a?(Array) || b.is_a?(Hash)
     opts = { :similarity => 0.8 }.merge(options)
 
     count_a = count_nodes(a)
@@ -57,19 +59,17 @@ module HashDiff
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
   def self.decode_property_path(path, delimiter='.')
-    parts = path.split(delimiter).collect do |part|
-      if part =~ /^(\w*)\[(\d+)\]$/
+    path.split(delimiter).inject([]) do |memo, part|
+      if part =~ /^(.*)\[(\d+)\]$/
         if $1.size > 0
-          [$1, $2.to_i]
+          memo + [$1, $2.to_i]
         else
-          $2.to_i
+          memo + [$2.to_i]
         end
       else
-        part
+        memo + [part]
       end
     end
-
-    parts.flatten
   end
 
   # @private
@@ -93,9 +93,13 @@ module HashDiff
     end
 
     if options[:strip] == true
-      first = obj1.strip if obj1.respond_to?(:strip)
-      second = obj2.strip if obj2.respond_to?(:strip)
-      return first == second
+      obj1 = obj1.strip if obj1.respond_to?(:strip)
+      obj2 = obj2.strip if obj2.respond_to?(:strip)
+    end
+
+    if options[:case_insensitive] == true
+      obj1 = obj1.downcase if obj1.respond_to?(:downcase)
+      obj2 = obj2.downcase if obj2.respond_to?(:downcase)
     end
 
     obj1 == obj2
@@ -125,6 +129,22 @@ module HashDiff
       elsif res == true
         return []
       end
+    end
+  end
+
+  def self.prefix_append_key(prefix, key, opts)
+    if opts[:array_path]
+      prefix + [key]
+    else
+      prefix.empty? ? "#{key}" : "#{prefix}#{opts[:delimiter]}#{key}"
+    end
+  end
+
+  def self.prefix_append_array_index(prefix, array_index, opts)
+    if opts[:array_path]
+      prefix + [array_index]
+    else
+      "#{prefix}[#{array_index}]"
     end
   end
 end

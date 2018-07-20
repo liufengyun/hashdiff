@@ -7,10 +7,12 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :array_path (Boolean) [false] whether to return the path references for nested values in an array, can be used for patch compatibility with non string keys.
+  #   * :use_lcs (Boolean) [true] whether or not to use an implementation of the Longest common subsequence algorithm for comparing arrays, produces better diffs but is slower.
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
@@ -27,15 +29,15 @@ module HashDiff
   def self.best_diff(obj1, obj2, options = {}, &block)
     options[:comparison] = block if block_given?
 
-    opts = {similarity: 0.3}.merge!(options)
+    opts = { :similarity => 0.3 }.merge!(options)
     diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
 
-    opts = {similarity: 0.5}.merge!(options)
+    opts = { :similarity => 0.5 }.merge!(options)
     diffs_2 = diff(obj1, obj2, opts)
     count_2 = count_diff diffs_2
 
-    opts = {similarity: 0.8}.merge!(options)
+    opts = { :similarity => 0.8 }.merge!(options)
     diffs_3 = diff(obj1, obj2, opts)
     count_3 = count_diff diffs_3
 
@@ -48,11 +50,14 @@ module HashDiff
   # @param [Array, Hash] obj1
   # @param [Array, Hash] obj2
   # @param [Hash] options the options to use when comparing
-  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Fixnum, Float, BigDecimal to each other
+  #   * :strict (Boolean) [true] whether numeric values will be compared on type as well as value.  Set to false to allow comparing Integer, Float, BigDecimal to each other
   #   * :similarity (Numeric) [0.8] should be between (0, 1]. Meaningful if there are similar hashes in arrays. See {best_diff}.
   #   * :delimiter (String) ['.'] the delimiter used when returning nested key references
   #   * :numeric_tolerance (Numeric) [0] should be a positive numeric value.  Value by which numeric differences must be greater than.  By default, numeric values are compared exactly; with the :tolerance option, the difference between numeric values must be greater than the given value.
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
+  #   * :array_path (Boolean) [false] whether to return the path references for nested values in an array, can be used for patch compatibility with non string keys.
+  #   * :use_lcs (Boolean) [true] whether or not to use an implementation of the Longest common subsequence algorithm for comparing arrays, produces better diffs but is slower.
+  #
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
@@ -74,8 +79,12 @@ module HashDiff
       :delimiter   =>   '.',
       :strict      =>   true,
       :strip       =>   false,
-      :numeric_tolerance => 0
+      :numeric_tolerance => 0,
+      :array_path  =>   false,
+      :use_lcs     =>   true
     }.merge!(options)
+
+    opts[:prefix] = [] if opts[:array_path] && opts[:prefix] == ''
 
     opts[:comparison] = block if block_given?
 
@@ -103,62 +112,59 @@ module HashDiff
     end
 
     result = []
-    if obj1.is_a?(Array)
-      changeset = diff_array(obj1, obj2, opts) do |lcs|
+    if obj1.is_a?(Array) && opts[:use_lcs]
+      changeset = diff_array_lcs(obj1, obj2, opts) do |lcs|
         # use a's index for similarity
         lcs.each do |pair|
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: "#{opts[:prefix]}[#{pair[0]}]")))
+          prefix = prefix_append_array_index(opts[:prefix], pair[0], opts)
+          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(:prefix => prefix)))
         end
       end
 
       changeset.each do |change|
+        change_key = prefix_append_array_index(opts[:prefix], change[1], opts)
         if change[0] == '-'
-          result << ['-', "#{opts[:prefix]}[#{change[1]}]", change[2]]
+          result << ['-', change_key, change[2]]
         elsif change[0] == '+'
-          result << ['+', "#{opts[:prefix]}[#{change[1]}]", change[2]]
+          result << ['+', change_key, change[2]]
         end
       end
+    elsif obj1.is_a?(Array) && !opts[:use_lcs]
+      result.concat(LinearCompareArray.call(obj1, obj2, opts))
     elsif obj1.is_a?(Hash)
-      if opts[:prefix].empty?
-        prefix = ""
-      else
-        prefix = "#{opts[:prefix]}#{opts[:delimiter]}"
-      end
 
-      deleted_keys = []
-      common_keys = []
-
-      obj1.each do |k, v|
-        if obj2.key?(k)
-          common_keys << k
-        else
-          deleted_keys << k
-        end
-      end
+      deleted_keys = obj1.keys - obj2.keys
+      common_keys = obj1.keys & obj2.keys
+      added_keys = obj2.keys - obj1.keys
 
       # add deleted properties
-      deleted_keys.each do |k|
-        custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", obj1[k], nil)
+      deleted_keys.sort_by{|k,v| k.to_s }.each do |k|
+        change_key = prefix_append_key(opts[:prefix], k, opts)
+        custom_result = custom_compare(opts[:comparison], change_key, obj1[k], nil)
 
         if custom_result
           result.concat(custom_result)
         else
-          result << ['-', "#{prefix}#{k}", obj1[k]]
+          result << ['-', change_key, obj1[k]]
         end
       end
 
       # recursive comparison for common keys
-      common_keys.each {|k| result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: "#{prefix}#{k}"))) }
+      common_keys.sort_by{|k,v| k.to_s }.each do |k|
+        prefix = prefix_append_key(opts[:prefix], k, opts)
+        result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => prefix)))
+      end
 
       # added properties
-      obj2.each do |k, v|
+      added_keys.sort_by{|k,v| k.to_s }.each do |k|
+        change_key = prefix_append_key(opts[:prefix], k, opts)
         unless obj1.key?(k)
-          custom_result = custom_compare(opts[:comparison], "#{prefix}#{k}", nil, v)
+          custom_result = custom_compare(opts[:comparison], change_key, nil, obj2[k])
 
           if custom_result
             result.concat(custom_result)
           else
-            result << ['+', "#{prefix}#{k}", obj2[k]]
+            result << ['+', change_key, obj2[k]]
           end
         end
       end
@@ -173,7 +179,7 @@ module HashDiff
   # @private
   #
   # diff array using LCS algorithm
-  def self.diff_array(a, b, options = {})
+  def self.diff_array_lcs(a, b, options = {})
     opts = {
       :prefix      =>   '',
       :similarity  =>   0.8,
@@ -226,5 +232,4 @@ module HashDiff
 
     change_set
   end
-
 end

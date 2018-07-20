@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- Appraisals {spec}/*`.split("\n")
 
   s.require_paths = ['lib']
-  s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
+  s.required_ruby_version = Gem::Requirement.new(">= 1.9.3")
 
   s.authors = ["Liu Fengyun"]
   s.email   = ["liufengyunchina@gmail.com"]

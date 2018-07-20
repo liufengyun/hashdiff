@@ -6,7 +6,7 @@ module HashDiff
   def self.lcs(a, b, options = {})
     opts = { :similarity => 0.8 }.merge!(options)
 
-    opts[:prefix] = "#{opts[:prefix]}[*]"
+    opts[:prefix] = prefix_append_array_index(opts[:prefix], '*', opts)
 
     return [] if a.size == 0 or b.size == 0
 
@@ -16,9 +16,9 @@ module HashDiff
     vector = []
 
     lcs = []
-    (0..b_finish).each do |bi|
+    (b_start..b_finish).each do |bi|
       lcs[bi] = [] 
-      (0..a_finish).each do |ai|
+      (a_start..a_finish).each do |ai|
         if similar?(a[ai], b[bi], opts)
           topleft = (ai > 0 and bi > 0)? lcs[bi-1][ai-1][1] : 0
           lcs[bi][ai] = [:topleft, topleft + 1]

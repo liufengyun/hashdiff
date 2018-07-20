@@ -1,4 +1,4 @@
-# 
+#
 # This module provides methods to diff two hash, patch and unpatch hash
 #
 module HashDiff
@@ -17,19 +17,21 @@ module HashDiff
     delimiter = options[:delimiter] || '.'
 
     changes.each do |change|
-      parts = decode_property_path(change[1], delimiter)
+      parts = change[1]
+      parts = decode_property_path(parts, delimiter) unless parts.is_a?(Array)
+
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Fixnum)
+        if parent_node.is_a?(Array)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Fixnum)
+        if parent_node.is_a?(Array)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
@@ -56,19 +58,21 @@ module HashDiff
     delimiter = options[:delimiter] || '.'
 
     changes.reverse_each do |change|
-      parts = decode_property_path(change[1], delimiter)
+      parts = change[1]
+      parts = decode_property_path(parts, delimiter) unless parts.is_a?(Array)
+
       last_part = parts.last
 
       parent_node = node(obj, parts[0, parts.size-1])
 
       if change[0] == '+'
-        if last_part.is_a?(Fixnum)
+        if parent_node.is_a?(Array)
           parent_node.delete_at(last_part)
         else
           parent_node.delete(last_part)
         end
       elsif change[0] == '-'
-        if last_part.is_a?(Fixnum)
+        if parent_node.is_a?(Array)
           parent_node.insert(last_part, change[2])
         else
           parent_node[last_part] = change[2]

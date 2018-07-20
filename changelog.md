@@ -1,5 +1,41 @@
 # Change Log
 
+## v0.3.7 2017-10-08
+
+* remove 1.8.7 support from gemspec #39
+
+## v0.3.6 2017-08-22
+
+* add option `use_lcs` #35
+
+## v0.3.5 2017-08-06
+
+* add option `array_path` #34
+
+## v0.3.4 2017-05-01
+
+* performance improvement of HashDiff#similar? #31
+
+## v0.3.2 2016-12-27
+
+* replace `Fixnum` by `Integer` #28
+
+## v0.3.1 2016-11-24
+
+* fix an error when a hash has mixed types #26
+
+## v0.3.0 2016-2-11
+
+* support `:case_insensitive` option
+
+## v0.2.3 2015-11-5
+
+* improve performance of LCS algorithm #12
+
+## v0.2.2 2014-10-6
+
+* make library 1.8.7 compatible
+
 ## v0.2.1 2014-7-13
 
 * yield added/deleted keys for custom comparison

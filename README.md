@@ -2,7 +2,9 @@
 
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
-**Demo**: [HashDiff](http://hashdiff.herokuapp.com/)
+It also supports comparing two arrays.
+
+HashDiff does not monkey-patch any existing class. All features are contained inside the `HashDiff` module.
 
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
@@ -70,8 +72,8 @@ diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-
 patch example:
 
 ```ruby
-a = {a: 3}
-b = {a: {a1: 1, a2: 2}}
+a = {'a' => 3}
+b = {'a' => {'a1' => 1, 'a2' => 2}}
 
 diff = HashDiff.diff(a, b)
 HashDiff.patch!(a, diff).should == b
@@ -80,8 +82,8 @@ HashDiff.patch!(a, diff).should == b
 unpatch example:
 
 ```ruby
-a = [{a: 1, b: 2, c: 3, d: 4, e: 5}, {x: 5, y: 6, z: 3}, 1]
-b = [1, {a: 1, b: 2, c: 3, e: 5}]
+a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 1]
+b = [1, {'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}]
 
 diff = HashDiff.diff(a, b) # diff two array is OK
 HashDiff.unpatch!(b, diff).should == a
@@ -89,7 +91,9 @@ HashDiff.unpatch!(b, diff).should == a
 
 ### Options
 
-There are five options available: `:delimiter`, `:similarity`, `:strict`, `:numeric_tolerance` and `:strip`.
+There are eight options available: `:delimiter`, `:similarity`,
+`:strict`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path`
+and `:use_lcs`
 
 #### `:delimiter`
 
@@ -135,6 +139,73 @@ diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip =>
 diff.should == [["~", "x", 5, 6]]
 ```
 
+#### `:case_insensitive`
+
+The :case_insensitive option makes string comparisons ignore case.
+
+```ruby
+a = {x:5, s:'FooBar'}
+b = {x:6, s:'foobar'}
+
+diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
+diff.should == [["~", "x", 5, 6]]
+```
+
+#### `:array_path`
+
+The :array_path option represents the path of the diff in an array rather than
+a string. This can be used to show differences in between hash key types and
+is useful for `patch!` when used on hashes without string keys.
+
+```ruby
+a = {x:5}
+b = {'x'=>6}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [['-', [:x], 5], ['+', ['x'], 6]]
+```
+
+For cases where there are arrays in paths their index will be added to the path.
+```ruby
+a = {x:[0,1]}
+b = {x:[0,2]}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [["-", [:x, 1], 1], ["+", [:x, 1], 2]]
+```
+
+This shouldn't cause problems if you are comparing an array with a hash:
+
+```ruby
+a = {x:{0=>1}}
+b = {x:[1]}
+
+diff = HashDiff.diff(a, b, :array_path => true)
+diff.should == [["~", [:a], [1], {0=>1}]]
+```
+
+#### `:use_lcs`
+
+The :use_lcs option is used to specify whether a
+[Longest common subsequence](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem)
+(LCS) algorithm is used to determine differences in arrays. This defaults to
+`true` but can be changed to `false` for significantly faster array comparisons
+(O(n) complexity rather than O(n<sup>2</sup>) for LCS).
+
+When :use_lcs is false the results of array comparisons have a tendency to
+show changes at indexes rather than additions and subtractions when :use_lcs is
+true.
+
+Note, currently the :similarity option has no effect when :use_lcs is false.
+
+```ruby
+a = {x: [0, 1, 2]}
+b = {x: [0, 2, 2, 3]}
+
+diff = HashDiff.diff(a, b, :use_lcs => false)
+diff.should == [["~", "x[1]", 1, 2], ["+", "x[3]", 3]]
+```
+
 #### Specifying a custom comparison method
 
 It's possible to specify how the values of a key should be compared.
@@ -171,6 +242,8 @@ diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-",
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
 
+When used in conjunction with the `array_path` option, the path passed in as an argument will be an array. When determining the ordering of an array a key of `"*"` will be used in place of the `key[*]` field. It is possible, if you have hashes with integer or `"*"` keys, to have problems distinguishing between arrays and hashes - although this shouldn't be an issue unless your data is very difficult to predict and/or your custom rules are very specific.
+
 #### Sorting arrays before comparison
 
 An order difference alone between two arrays can create too many diffs to be useful. Consider sorting them prior to diffing.
@@ -184,23 +257,6 @@ HashDiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
 b[:b].sort!
 
 HashDiff.diff(a, b) => []
-```
-
-### Special use cases
-
-#### Using HashDiff on JSON API results
-
-```ruby
-require 'uri'
-require 'net/http'
-require 'json'
-
-uri = URI('http://time.jsontest.com/')
-json_resp = ->(uri) { JSON.parse(Net::HTTP.get_response(uri).body) }
-a = json_resp.call(uri)
-b = json_resp.call(uri)
-
-HashDiff.diff(a,b) => [["~", "milliseconds_since_epoch", 1410542545874, 1410542545985]]
 ```
 
 ## License

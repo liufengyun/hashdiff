@@ -61,6 +61,18 @@ describe HashDiff do
     HashDiff.unpatch!(b, diff).should == a
   end
 
+  it "should be able to patch array under hash key with non-word characters" do
+    a = {"a" => 1, "b-b" => [1, 2]}
+    b = {"a" => 1, "b-b" => [2, 1]}
+    diff = HashDiff.diff(a, b)
+
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, "b-b" => [1, 2]}
+    b = {"a" => 1, "b-b" => [2, 1]}
+    HashDiff.unpatch!(b, diff).should == a
+  end
+
   it "should be able to patch hash value removal" do
     a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
     b = {"a" => 1}
@@ -133,4 +145,39 @@ describe HashDiff do
     HashDiff.unpatch!(b, diff).should == a
   end
 
+  it "should be able to patch hash value removal with custom delimiter" do
+    a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
+    b = {"a" => 1, "b" => {"b1" => 3} }
+    diff = HashDiff.diff(a, b, :delimiter => "\n")
+
+    HashDiff.patch!(a, diff, :delimiter => "\n").should == b
+
+    a = {"a" => 1, "b" => {"b1" => 1, "b2" =>2}}
+    b = {"a" => 1, "b" => {"b1" => 3} }
+    HashDiff.unpatch!(b, diff, :delimiter => "\n").should == a
+  end
+
+  it "should be able to patch when the diff is generated with an array_path" do
+    a = {"a" => 1, "b" => 1}
+    b = {"a" => 1, "b" => 2}
+    diff = HashDiff.diff(a, b, :array_path => true)
+
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, "b" => 1}
+    b = {"a" => 1, "b" => 2}
+    HashDiff.unpatch!(b, diff).should == a
+  end
+
+  it "should be able to use non string keys when diff is generated with an array_path" do
+    a = {"a" => 1, :a => 2, 0 => 3}
+    b = {"a" => 5, :a => 6, 0 => 7}
+    diff = HashDiff.diff(a, b, :array_path => true)
+
+    HashDiff.patch!(a, diff).should == b
+
+    a = {"a" => 1, :a => 2, 0 => 3}
+    b = {"a" => 5, :a => 6, 0 => 7}
+    HashDiff.unpatch!(b, diff).should == a
+  end
 end
