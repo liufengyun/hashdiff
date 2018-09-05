@@ -180,4 +180,12 @@ describe HashDiff do
     b = {"a" => 5, :a => 6, 0 => 7}
     HashDiff.unpatch!(b, diff).should == a
   end
+
+  it "should auto create empty hash. BUG: cannot convert array" do
+    a = {}
+    HashDiff.patch!(a, [['+', 'a.b.c', 'a'], ['+', 'a.b.d', 'b'], ['+', 'b.c[1]', 'c']]).should == {
+      'a' => { 'b' => { 'c' => 'a', 'd' => 'b'} },
+      'b' => { 'c' => { 1 => 'c' } }
+    }
+  end
 end
