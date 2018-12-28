@@ -1,4 +1,4 @@
-# HashDiff [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.png)](http://travis-ci.org/liufengyun/hashdiff) [![Gem Version](https://badge.fury.io/rb/hashdiff.png)](http://badge.fury.io/rb/hashdiff)
+# HashDiff [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.svg)](http://travis-ci.org/liufengyun/hashdiff) [![Gem Version](https://badge.fury.io/rb/hashdiff.svg)](http://badge.fury.io/rb/hashdiff)
 
 HashDiff is a ruby library to compute the smallest difference between two hashes.
 
