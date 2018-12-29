@@ -21,5 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('bluecloth')
   s.add_development_dependency('rspec', '~> 2.0')
+  s.add_development_dependency('rubocop')
+  s.add_development_dependency('rubocop-rspec')
   s.add_development_dependency('yard')
 end
