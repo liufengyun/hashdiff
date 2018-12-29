@@ -6,7 +6,7 @@ describe HashDiff do
     b = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200, 'g' => 300 }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200 }
     b = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200, 'g' => 300 }
@@ -18,7 +18,7 @@ describe HashDiff do
     b = { 'a' => { 'a1' => 1, 'a2' => 2 } }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 3 }
     b = { 'a' => { 'a1' => 1, 'a2' => 2 } }
@@ -30,7 +30,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => [] }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => [1, 2] }
     b = { 'a' => 1, 'b' => [] }
@@ -42,7 +42,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => nil }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => [1, 2] }
     b = { 'a' => 1, 'b' => nil }
@@ -54,7 +54,7 @@ describe HashDiff do
     b = { 'a' => 1 }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => [1, 2] }
     b = { 'a' => 1 }
@@ -66,7 +66,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b-b' => [2, 1] }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b-b' => [1, 2] }
     b = { 'a' => 1, 'b-b' => [2, 1] }
@@ -78,7 +78,7 @@ describe HashDiff do
     b = { 'a' => 1 }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => { 'b1' => 1, 'b2' => 2 } }
     b = { 'a' => 1 }
@@ -90,7 +90,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => {} }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => { 'b1' => 1, 'b2' => 2 } }
     b = { 'a' => 1, 'b' => {} }
@@ -102,7 +102,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => nil }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => { 'b1' => 1, 'b2' => 2 } }
     b = { 'a' => 1, 'b' => nil }
@@ -114,7 +114,7 @@ describe HashDiff do
     b = { 'a' => 1 }
     diff = described_class.diff(a, b)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => nil }
     b = { 'a' => 1 }
@@ -126,7 +126,7 @@ describe HashDiff do
     b = [1, { 'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5 }]
 
     diff = described_class.diff(a, b)
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = [{ 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5 }, 3]
     b = [1, { 'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5 }]
@@ -138,7 +138,7 @@ describe HashDiff do
     b = [1, { 'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5 }]
 
     diff = described_class.diff(a, b)
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = [{ 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5 }, { 'x' => 5, 'y' => 6, 'z' => 3 }, 1]
     b = [1, { 'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5 }]
@@ -150,7 +150,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => { 'b1' => 3 } }
     diff = described_class.diff(a, b, delimiter: "\n")
 
-    described_class.patch!(a, diff, delimiter: "\n").should == b
+    expect(described_class.patch!(a, diff, delimiter: "\n")).to eq(b)
 
     a = { 'a' => 1, 'b' => { 'b1' => 1, 'b2' => 2 } }
     b = { 'a' => 1, 'b' => { 'b1' => 3 } }
@@ -162,7 +162,7 @@ describe HashDiff do
     b = { 'a' => 1, 'b' => 2 }
     diff = described_class.diff(a, b, array_path: true)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, 'b' => 1 }
     b = { 'a' => 1, 'b' => 2 }
@@ -174,7 +174,7 @@ describe HashDiff do
     b = { 'a' => 5, :a => 6, 0 => 7 }
     diff = described_class.diff(a, b, array_path: true)
 
-    described_class.patch!(a, diff).should == b
+    expect(described_class.patch!(a, diff)).to eq(b)
 
     a = { 'a' => 1, :a => 2, 0 => 3 }
     b = { 'a' => 5, :a => 6, 0 => 7 }

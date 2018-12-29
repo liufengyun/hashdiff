@@ -11,7 +11,7 @@ describe HashDiff do
     b = {}
 
     diff = described_class.diff(a, b)
-    diff.should == [['-', 'a', 3], ['-', 'b', 2]]
+    expect(diff).to eq([['-', 'a', 3], ['-', 'b', 2]])
 
     diff = described_class.diff(b, a)
     diff.should == [['+', 'a', 3], ['+', 'b', 2]]
@@ -63,7 +63,7 @@ describe HashDiff do
     diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]
   end
 
-  it 'is able to diff similar objects in array' do
+  it 'is able to best diff similar objects in array' do
     diff = described_class.best_diff({ 'a' => [{ 'x' => 2, 'y' => 3, 'z' => 4 }, { 'x' => 11, 'y' => 22, 'z' => 33 }], 'b' => { 'x' => 3, 'z' => 45 } },
                                      'a' => [{ 'y' => 3 }, { 'x' => 11, 'z' => 33 }], 'b' => { 'y' => 22 })
     diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 22]]
@@ -74,7 +74,7 @@ describe HashDiff do
     b = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200, 'g' => 300 }
 
     diff = described_class.diff(a, b)
-    diff.should == [['+', 'g', 300]]
+    expect(diff).to eq([['+', 'g', 300]])
 
     diff = described_class.diff(b, a)
     diff.should == [['-', 'g', 300]]
@@ -85,7 +85,7 @@ describe HashDiff do
     b = { 'a' => { 'a1' => 1, 'a2' => 2 } }
 
     diff = described_class.diff(a, b)
-    diff.should == [['~', 'a', 3, { 'a1' => 1, 'a2' => 2 }]]
+    expect(diff).to eq([['~', 'a', 3, { 'a1' => 1, 'a2' => 2 }]])
 
     diff = described_class.diff(b, a)
     diff.should == [['~', 'a', { 'a1' => 1, 'a2' => 2 }, 3]]
@@ -169,7 +169,7 @@ describe HashDiff do
       b = { 'a' => 0.557, 'b' => 'hats', 'c' => 0.67, 'd' => 'fin' }
 
       diff = described_class.diff(a, b, numeric_tolerance: 0.01)
-      diff.should == [['~', 'b', 0.0, 'hats'], ['~', 'c', 0.65, 0.67]]
+      expect(diff).to eq([['~', 'b', 0.0, 'hats'], ['~', 'c', 0.65, 0.67]])
 
       diff = described_class.diff(b, a, numeric_tolerance: 0.01)
       diff.should == [['~', 'b', 'hats', 0.0], ['~', 'c', 0.67, 0.65]]
@@ -180,7 +180,7 @@ describe HashDiff do
       b = { 'a' => { 'x' => 0.6, 'y' => 0.341 }, 'b' => [14, 68.025] }
 
       diff = described_class.diff(a, b, numeric_tolerance: 0.01)
-      diff.should == [['~', 'a.x', 0.4, 0.6], ['-', 'b[0]', 13], ['+', 'b[0]', 14]]
+      expect(diff).to eq([['~', 'a.x', 0.4, 0.6], ['-', 'b[0]', 13], ['+', 'b[0]', 14]])
 
       diff = described_class.diff(b, a, numeric_tolerance: 0.01)
       diff.should == [['~', 'a.x', 0.6, 0.4], ['-', 'b[0]', 14], ['+', 'b[0]', 13]]

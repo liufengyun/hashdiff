@@ -55,14 +55,22 @@ describe HashDiff do
       expect(described_class.compare_values(10.004, 10.003, numeric_tolerance: 0.01)).to be true
     end
 
-    it 'compares other objects with or without tolerance' do
+    it 'compares different objects without tolerance' do
       expect(described_class.compare_values('hats', 'ninjas')).to be false
+    end
+    it 'compares other objects with tolerance' do
       expect(described_class.compare_values('hats', 'ninjas', numeric_tolerance: 0.01)).to be false
+    end
+
+    it 'compares same objects without tolerance' do
       expect(described_class.compare_values('horse', 'horse')).to be true
     end
 
-    it 'compares strings exactly by default' do
+    it 'compares strings for spaces exactly by default' do
       expect(described_class.compare_values(' horse', 'horse')).to be false
+    end
+
+    it 'compares strings for capitalization exactly by default' do
       expect(described_class.compare_values('horse', 'Horse')).to be false
     end
 
