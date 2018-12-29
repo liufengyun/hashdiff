@@ -2,20 +2,18 @@ module HashDiff
   # @private
   #
   # judge whether two objects are similar
-  def self.similar?(a, b, options = {})
-    return compare_values(a, b, options) unless a.is_a?(Array) || a.is_a?(Hash) || b.is_a?(Array) || b.is_a?(Hash)
+  def self.similar?(obja, objb, options = {})
+    return compare_values(obja, objb, options) unless obja.is_a?(Array) || obja.is_a?(Hash) || objb.is_a?(Array) || objb.is_a?(Hash)
 
     opts = { similarity: 0.8 }.merge(options)
 
-    count_a = count_nodes(a)
-    count_b = count_nodes(b)
-    diffs = count_diff diff(a, b, opts)
+    count_a = count_nodes(obja)
+    count_b = count_nodes(objb)
+    diffs = count_diff diff(obja, objb, opts)
 
-    if count_a + count_b == 0
-      return true
-    else
-      (1 - diffs.to_f / (count_a + count_b).to_f) >= opts[:similarity]
-    end
+    return true if (count_a + count_b).zero?
+
+    (1 - diffs.to_f / (count_a + count_b).to_f) >= opts[:similarity]
   end
 
   # @private
@@ -25,7 +23,7 @@ module HashDiff
     diffs.inject(0) do |sum, item|
       old_change_count = count_nodes(item[2])
       new_change_count = count_nodes(item[3])
-      sum += (old_change_count + new_change_count)
+      sum + (old_change_count + new_change_count)
     end
   end
 
@@ -117,16 +115,13 @@ module HashDiff
   #
   # try custom comparison
   def self.custom_compare(method, key, obj1, obj2)
-    if method
-      res = method.call(key, obj1, obj2)
+    return unless method
 
-      # nil != false here
-      if res == false
-        return [['~', key, obj1, obj2]]
-      elsif res == true
-        return []
-      end
-    end
+    res = method.call(key, obj1, obj2)
+
+    # nil != false here
+    return [['~', key, obj1, obj2]] if res == false
+    return [] if res == true
   end
 
   def self.prefix_append_key(prefix, key, opts)

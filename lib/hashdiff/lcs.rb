@@ -3,43 +3,39 @@ module HashDiff
   #
   # caculate array difference using LCS algorithm
   # http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
-  def self.lcs(a, b, options = {})
+  def self.lcs(arraya, arrayb, options = {})
     opts = { similarity: 0.8 }.merge!(options)
 
     opts[:prefix] = prefix_append_array_index(opts[:prefix], '*', opts)
 
-    return [] if a.empty? || b.empty?
+    return [] if arraya.empty? || arrayb.empty?
 
     a_start = b_start = 0
-    a_finish = a.size - 1
-    b_finish = b.size - 1
+    a_finish = arraya.size - 1
+    b_finish = arrayb.size - 1
     vector = []
 
     lcs = []
     (b_start..b_finish).each do |bi|
       lcs[bi] = []
       (a_start..a_finish).each do |ai|
-        if similar?(a[ai], b[bi], opts)
+        if similar?(arraya[ai], arrayb[bi], opts)
           topleft = (ai > 0) && (bi > 0) ? lcs[bi - 1][ai - 1][1] : 0
           lcs[bi][ai] = [:topleft, topleft + 1]
-        elsif
-          top = bi > 0 ? lcs[bi - 1][ai][1] : 0
+        elsif (top = bi > 0 ? lcs[bi - 1][ai][1] : 0)
           left = ai > 0 ? lcs[bi][ai - 1][1] : 0
           count = top > left ? top : left
 
-          direction = :both
           direction = if top > left
                         :top
                       elsif top < left
                         :left
+                      elsif bi.zero?
+                        :top
+                      elsif ai.zero?
+                        :left
                       else
-                        direction = if bi == 0
-                                      :top
-                                    elsif ai == 0
-                                      :left
-                                    else
-                                      :both
-                                    end
+                        :both
                       end
 
           lcs[bi][ai] = [direction, count]

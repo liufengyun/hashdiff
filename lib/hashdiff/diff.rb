@@ -29,19 +29,19 @@ module HashDiff
     options[:comparison] = block if block_given?
 
     opts = { similarity: 0.3 }.merge!(options)
-    diffs_1 = diff(obj1, obj2, opts)
-    count_1 = count_diff diffs_1
+    diffs1 = diff(obj1, obj2, opts)
+    count1 = count_diff diffs1
 
     opts = { similarity: 0.5 }.merge!(options)
-    diffs_2 = diff(obj1, obj2, opts)
-    count_2 = count_diff diffs_2
+    diffs2 = diff(obj1, obj2, opts)
+    count2 = count_diff diffs2
 
     opts = { similarity: 0.8 }.merge!(options)
-    diffs_3 = diff(obj1, obj2, opts)
-    count_3 = count_diff diffs_3
+    diffs3 = diff(obj1, obj2, opts)
+    count3 = count_diff diffs3
 
-    count, diffs = count_1 < count_2 ? [count_1, diffs_1] : [count_2, diffs_2]
-    diffs = count < count_3 ? diffs : diffs_3
+    count, diffs = count1 < count2 ? [count1, diffs1] : [count2, diffs2]
+    count < count3 ? diffs : diffs3
   end
 
   # Compute the diff of two hashes or arrays
@@ -168,7 +168,7 @@ module HashDiff
   # @private
   #
   # diff array using LCS algorithm
-  def self.diff_array_lcs(a, b, options = {})
+  def self.diff_array_lcs(arraya, arrayb, options = {})
     opts = {
       prefix: '',
       similarity: 0.8,
@@ -176,28 +176,28 @@ module HashDiff
     }.merge!(options)
 
     change_set = []
-    if a.empty? && b.empty?
-      return []
-    elsif a.empty?
-      b.each_index do |index|
-        change_set << ['+', index, b[index]]
+    return [] if arraya.empty? && arrayb.empty?
+
+    if arraya.empty?
+      arrayb.each_index do |index|
+        change_set << ['+', index, arrayb[index]]
       end
       return change_set
-    elsif b.empty?
-      a.each_index do |index|
-        i = a.size - index - 1
-        change_set << ['-', i, a[i]]
+    elsif arrayb.empty?
+      arraya.each_index do |index|
+        i = arraya.size - index - 1
+        change_set << ['-', i, arraya[i]]
       end
       return change_set
     end
 
-    links = lcs(a, b, opts)
+    links = lcs(arraya, arrayb, opts)
 
     # yield common
     yield links if block_given?
 
     # padding the end
-    links << [a.size, b.size]
+    links << [arraya.size, arrayb.size]
 
     last_x = -1
     last_y = -1
@@ -206,12 +206,12 @@ module HashDiff
 
       # remove from a, beginning from the end
       (x > last_x + 1) && (x - last_x - 2).downto(0).each do |i|
-        change_set << ['-', last_y + i + 1, a[i + last_x + 1]]
+        change_set << ['-', last_y + i + 1, arraya[i + last_x + 1]]
       end
 
       # add from b, beginning from the head
       (y > last_y + 1) && 0.upto(y - last_y - 2).each do |i|
-        change_set << ['+', last_y + i + 1, b[i + last_y + 1]]
+        change_set << ['+', last_y + i + 1, arrayb[i + last_y + 1]]
       end
 
       # update flags
