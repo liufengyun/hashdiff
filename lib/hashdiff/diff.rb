@@ -1,5 +1,4 @@
 module HashDiff
-
   # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #
   # HashDiff.best_diff is useful in case of comparing two objects which include similar hashes in arrays.
@@ -29,15 +28,15 @@ module HashDiff
   def self.best_diff(obj1, obj2, options = {}, &block)
     options[:comparison] = block if block_given?
 
-    opts = { :similarity => 0.3 }.merge!(options)
+    opts = { similarity: 0.3 }.merge!(options)
     diffs_1 = diff(obj1, obj2, opts)
     count_1 = count_diff diffs_1
 
-    opts = { :similarity => 0.5 }.merge!(options)
+    opts = { similarity: 0.5 }.merge!(options)
     diffs_2 = diff(obj1, obj2, opts)
     count_2 = count_diff diffs_2
 
-    opts = { :similarity => 0.8 }.merge!(options)
+    opts = { similarity: 0.8 }.merge!(options)
     diffs_3 = diff(obj1, obj2, opts)
     count_3 = count_diff diffs_3
 
@@ -74,14 +73,14 @@ module HashDiff
   # @since 0.0.1
   def self.diff(obj1, obj2, options = {}, &block)
     opts = {
-      :prefix      =>   '',
-      :similarity  =>   0.8,
-      :delimiter   =>   '.',
-      :strict      =>   true,
-      :strip       =>   false,
-      :numeric_tolerance => 0,
-      :array_path  =>   false,
-      :use_lcs     =>   true
+      prefix: '',
+      similarity: 0.8,
+      delimiter: '.',
+      strict: true,
+      strip: false,
+      numeric_tolerance: 0,
+      array_path: false,
+      use_lcs: true
     }.merge!(options)
 
     opts[:prefix] = [] if opts[:array_path] && opts[:prefix] == ''
@@ -92,21 +91,13 @@ module HashDiff
     result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
     return result if result
 
-    if obj1.nil? and obj2.nil?
-      return []
-    end
+    return [] if obj1.nil? && obj2.nil?
 
-    if obj1.nil?
-      return [['~', opts[:prefix], nil, obj2]]
-    end
+    return [['~', opts[:prefix], nil, obj2]] if obj1.nil?
 
-    if obj2.nil?
-      return [['~', opts[:prefix], obj1, nil]]
-    end
+    return [['~', opts[:prefix], obj1, nil]] if obj2.nil?
 
-    unless comparable?(obj1, obj2, opts[:strict])
-      return [['~', opts[:prefix], obj1, obj2]]
-    end
+    return [['~', opts[:prefix], obj1, obj2]] unless comparable?(obj1, obj2, opts[:strict])
 
     result = []
     if obj1.is_a?(Array) && opts[:use_lcs]
@@ -114,7 +105,7 @@ module HashDiff
         # use a's index for similarity
         lcs.each do |pair|
           prefix = prefix_append_array_index(opts[:prefix], pair[0], opts)
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(:prefix => prefix)))
+          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: prefix)))
         end
       end
 
@@ -135,7 +126,7 @@ module HashDiff
       added_keys = obj2.keys - obj1.keys
 
       # add deleted properties
-      deleted_keys.sort_by{|k,v| k.to_s }.each do |k|
+      deleted_keys.sort_by { |k, _v| k.to_s }.each do |k|
         change_key = prefix_append_key(opts[:prefix], k, opts)
         custom_result = custom_compare(opts[:comparison], change_key, obj1[k], nil)
 
@@ -147,26 +138,27 @@ module HashDiff
       end
 
       # recursive comparison for common keys
-      common_keys.sort_by{|k,v| k.to_s }.each do |k|
+      common_keys.sort_by { |k, _v| k.to_s }.each do |k|
         prefix = prefix_append_key(opts[:prefix], k, opts)
-        result.concat(diff(obj1[k], obj2[k], opts.merge(:prefix => prefix)))
+        result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
       end
 
       # added properties
-      added_keys.sort_by{|k,v| k.to_s }.each do |k|
+      added_keys.sort_by { |k, _v| k.to_s }.each do |k|
         change_key = prefix_append_key(opts[:prefix], k, opts)
-        unless obj1.key?(k)
-          custom_result = custom_compare(opts[:comparison], change_key, nil, obj2[k])
+        next if obj1.key?(k)
 
-          if custom_result
-            result.concat(custom_result)
-          else
-            result << ['+', change_key, obj2[k]]
-          end
+        custom_result = custom_compare(opts[:comparison], change_key, nil, obj2[k])
+
+        if custom_result
+          result.concat(custom_result)
+        else
+          result << ['+', change_key, obj2[k]]
         end
       end
     else
       return [] if compare_values(obj1, obj2, opts)
+
       return [['~', opts[:prefix], obj1, obj2]]
     end
 
@@ -178,20 +170,20 @@ module HashDiff
   # diff array using LCS algorithm
   def self.diff_array_lcs(a, b, options = {})
     opts = {
-      :prefix      =>   '',
-      :similarity  =>   0.8,
-      :delimiter   =>   '.'
+      prefix: '',
+      similarity: 0.8,
+      delimiter: '.'
     }.merge!(options)
 
     change_set = []
-    if a.size == 0 and b.size == 0
+    if a.empty? && b.empty?
       return []
-    elsif a.size == 0
+    elsif a.empty?
       b.each_index do |index|
         change_set << ['+', index, b[index]]
       end
       return change_set
-    elsif b.size == 0
+    elsif b.empty?
       a.each_index do |index|
         i = a.size - index - 1
         change_set << ['-', i, a[i]]
@@ -213,12 +205,12 @@ module HashDiff
       x, y = pair
 
       # remove from a, beginning from the end
-      (x > last_x + 1) and (x - last_x - 2).downto(0).each do |i|
+      (x > last_x + 1) && (x - last_x - 2).downto(0).each do |i|
         change_set << ['-', last_y + i + 1, a[i + last_x + 1]]
       end
 
       # add from b, beginning from the head
-      (y > last_y + 1) and 0.upto(y - last_y - 2).each do |i|
+      (y > last_y + 1) && 0.upto(y - last_y - 2).each do |i|
         change_set << ['+', last_y + i + 1, b[i + last_y + 1]]
       end
 

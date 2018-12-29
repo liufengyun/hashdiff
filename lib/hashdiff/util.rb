@@ -1,11 +1,11 @@
 module HashDiff
-
   # @private
   #
   # judge whether two objects are similar
   def self.similar?(a, b, options = {})
     return compare_values(a, b, options) unless a.is_a?(Array) || a.is_a?(Hash) || b.is_a?(Array) || b.is_a?(Hash)
-    opts = { :similarity => 0.8 }.merge(options)
+
+    opts = { similarity: 0.8 }.merge(options)
 
     count_a = count_nodes(a)
     count_b = count_nodes(b)
@@ -14,7 +14,7 @@ module HashDiff
     if count_a + count_b == 0
       return true
     else
-      (1 - diffs.to_f/(count_a + count_b).to_f) >= opts[:similarity]
+      (1 - diffs.to_f / (count_a + count_b).to_f) >= opts[:similarity]
     end
   end
 
@@ -37,9 +37,9 @@ module HashDiff
 
     count = 0
     if obj.is_a?(Array)
-      obj.each {|e| count += count_nodes(e) }
+      obj.each { |e| count += count_nodes(e) }
     elsif obj.is_a?(Hash)
-      obj.each {|k, v| count += count_nodes(v) }
+      obj.each { |_k, v| count += count_nodes(v) }
     else
       return 1
     end
@@ -54,13 +54,13 @@ module HashDiff
   # @param [String] delimiter Property-string delimiter
   #
   # e.g. "a.b[3].c" => ['a', 'b', 3, 'c']
-  def self.decode_property_path(path, delimiter='.')
+  def self.decode_property_path(path, delimiter = '.')
     path.split(delimiter).inject([]) do |memo, part|
       if part =~ /^(.*)\[(\d+)\]$/
-        if $1.size > 0
-          memo + [$1, $2.to_i]
+        if !Regexp.last_match(1).empty?
+          memo + [Regexp.last_match(1), Regexp.last_match(2).to_i]
         else
-          memo + [$2.to_i]
+          memo + [Regexp.last_match(2).to_i]
         end
       else
         memo + [part]
@@ -84,7 +84,7 @@ module HashDiff
   # check for equality or "closeness" within given tolerance
   def self.compare_values(obj1, obj2, options = {})
     if (options[:numeric_tolerance].is_a? Numeric) &&
-        [obj1, obj2].all? { |v| v.is_a? Numeric }
+       [obj1, obj2].all? { |v| v.is_a? Numeric }
       return (obj1 - obj2).abs <= options[:numeric_tolerance]
     end
 
@@ -109,6 +109,7 @@ module HashDiff
       return true if obj1.is_a?(type) && obj2.is_a?(type)
     end
     return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
+
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)
   end
 
@@ -132,7 +133,7 @@ module HashDiff
     if opts[:array_path]
       prefix + [key]
     else
-      prefix.empty? ? "#{key}" : "#{prefix}#{opts[:delimiter]}#{key}"
+      prefix.empty? ? key.to_s : "#{prefix}#{opts[:delimiter]}#{key}"
     end
   end
 

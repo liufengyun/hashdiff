@@ -2,7 +2,6 @@
 # This module provides methods to diff two hash, patch and unpatch hash
 #
 module HashDiff
-
   # Apply patch to object
   #
   # @param [Hash, Array] obj the object to be patched, can be an Array or a Hash
@@ -22,7 +21,7 @@ module HashDiff
 
       last_part = parts.last
 
-      parent_node = node(obj, parts[0, parts.size-1])
+      parent_node = node(obj, parts[0, parts.size - 1])
 
       if change[0] == '+'
         if parent_node.is_a?(Array)
@@ -63,7 +62,7 @@ module HashDiff
 
       last_part = parts.last
 
-      parent_node = node(obj, parts[0, parts.size-1])
+      parent_node = node(obj, parts[0, parts.size - 1])
 
       if change[0] == '+'
         if parent_node.is_a?(Array)
@@ -84,5 +83,4 @@ module HashDiff
 
     obj
   end
-
 end
