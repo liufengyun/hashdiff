@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.8 2018-12-30
+
+* Add Rubocop and drops Ruby 1.9 support #47
+
 ## v0.3.7 2017-10-08
 
 * remove 1.8.7 support from gemspec #39
