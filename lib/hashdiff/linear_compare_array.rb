@@ -5,7 +5,7 @@ module HashDiff
   # than using the lcs algorithm but is considerably faster
   class LinearCompareArray
     def self.call(old_array, new_array, options = {})
-      instance = self.new(old_array, new_array, options)
+      instance = new(old_array, new_array, options)
       instance.call
     end
 
@@ -79,7 +79,7 @@ module HashDiff
 
     def item_difference(old_item, new_item, item_index)
       prefix = HashDiff.prefix_append_array_index(options[:prefix], item_index, options)
-      HashDiff.diff(old_item, new_item, options.merge(:prefix => prefix))
+      HashDiff.diff(old_item, new_item, options.merge(prefix: prefix))
     end
 
     # look ahead in the new array to see if the current item appears later
@@ -120,6 +120,7 @@ module HashDiff
 
     def append_addititions_before_match(match_index)
       return unless match_index
+
       (new_index...match_index).each { |i| append_addition(new_array[i], i) }
       self.expected_additions = expected_additions - (match_index - new_index)
       self.new_index = match_index
@@ -127,6 +128,7 @@ module HashDiff
 
     def append_deletions_before_match(match_index)
       return unless match_index
+
       (old_index...match_index).each { |i| append_deletion(old_array[i], i) }
       self.expected_additions = expected_additions + (match_index - new_index)
       self.old_index = match_index
