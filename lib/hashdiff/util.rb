@@ -37,7 +37,7 @@ module HashDiff
     if obj.is_a?(Array)
       obj.each { |e| count += count_nodes(e) }
     elsif obj.is_a?(Hash)
-      obj.each { |_k, v| count += count_nodes(v) }
+      obj.each_value { |v| count += count_nodes(v) }
     else
       return 1
     end
