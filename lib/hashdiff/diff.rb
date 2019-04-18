@@ -173,27 +173,32 @@ module HashDiff
   #
   # diff array using LCS algorithm
   def self.diff_array_lcs(arraya, arrayb, options = {})
-    opts = {
-      prefix: '',
-      similarity: 0.8,
-      delimiter: '.'
-    }.merge!(options)
+    return [] if arraya.empty? && arrayb.empty?
 
     change_set = []
-    return [] if arraya.empty? && arrayb.empty?
 
     if arraya.empty?
       arrayb.each_index do |index|
         change_set << ['+', index, arrayb[index]]
       end
+
       return change_set
-    elsif arrayb.empty?
+    end
+
+    if arrayb.empty?
       arraya.each_index do |index|
         i = arraya.size - index - 1
         change_set << ['-', i, arraya[i]]
       end
+
       return change_set
     end
+
+    opts = {
+      prefix: '',
+      similarity: 0.8,
+      delimiter: '.'
+    }.merge!(options)
 
     links = lcs(arraya, arrayb, opts)
 
