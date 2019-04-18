@@ -6,11 +6,11 @@ module HashDiff
   # caculate array difference using LCS algorithm
   # http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
   def self.lcs(arraya, arrayb, options = {})
+    return [] if arraya.empty? || arrayb.empty?
+
     opts = { similarity: 0.8 }.merge!(options)
 
     opts[:prefix] = prefix_append_array_index(opts[:prefix], '*', opts)
-
-    return [] if arraya.empty? || arrayb.empty?
 
     a_start = b_start = 0
     a_finish = arraya.size - 1
