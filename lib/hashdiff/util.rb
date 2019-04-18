@@ -84,8 +84,8 @@ module HashDiff
   #
   # check for equality or "closeness" within given tolerance
   def self.compare_values(obj1, obj2, options = {})
-    if (options[:numeric_tolerance].is_a? Numeric) &&
-       [obj1, obj2].all? { |v| v.is_a? Numeric }
+    if options[:numeric_tolerance].is_a?(Numeric) &&
+       obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
       return (obj1 - obj2).abs <= options[:numeric_tolerance]
     end
 
