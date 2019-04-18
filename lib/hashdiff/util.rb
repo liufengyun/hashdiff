@@ -105,9 +105,7 @@ module HashDiff
   #
   # check if objects are comparable
   def self.comparable?(obj1, obj2, strict = true)
-    [Array, Hash].each do |type|
-      return true if obj1.is_a?(type) && obj2.is_a?(type)
-    end
+    return true if (obj1.is_a?(Array) || obj1.is_a?(Hash)) && obj2.is_a?(obj1.class)
     return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
 
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)
