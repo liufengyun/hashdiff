@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'hashdiff/util'
-require 'hashdiff/lcs'
-require 'hashdiff/linear_compare_array'
-require 'hashdiff/diff'
-require 'hashdiff/patch'
-require 'hashdiff/version'
+require_relative 'hashdiff/util'
+require_relative 'hashdiff/lcs'
+require_relative 'hashdiff/linear_compare_array'
+require_relative 'hashdiff/diff'
+require_relative 'hashdiff/patch'
+require_relative 'hashdiff/version'
