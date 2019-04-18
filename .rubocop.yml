@@ -17,5 +17,8 @@ Metrics/ModuleLength:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
 RSpec/ExampleLength:
   Enabled: false
