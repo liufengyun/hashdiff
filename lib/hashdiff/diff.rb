@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module HashDiff
   # Best diff two objects, which tries to generate the smallest change set using different similarity values.
   #

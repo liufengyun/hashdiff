@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # This module provides methods to diff two hash, patch and unpatch hash
 #
