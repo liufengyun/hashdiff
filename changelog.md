@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.9 2019-04-22
+
+* Performance tweak (thanks @krzysiek1507: #51 #52 #53)
+
 ## v0.3.8 2018-12-30
 
 * Add Rubocop and drops Ruby 1.9 support #47
@@ -73,4 +77,3 @@ For example, `diff({a:2, c:[4, 5]}, {a:2}) will generate following output:
 instead of following:
 
     [['-', 'c[0]', 4], ['-', 'c[1]', 5], ['-', 'c', []]]
-
