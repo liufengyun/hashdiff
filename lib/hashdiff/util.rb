@@ -7,13 +7,14 @@ module HashDiff
   def self.similar?(obja, objb, options = {})
     return compare_values(obja, objb, options) unless obja.is_a?(Array) || obja.is_a?(Hash) || objb.is_a?(Array) || objb.is_a?(Hash)
 
-    opts = { similarity: 0.8 }.merge(options)
-
     count_a = count_nodes(obja)
     count_b = count_nodes(objb)
-    diffs = count_diff diff(obja, objb, opts)
 
     return true if (count_a + count_b).zero?
+
+    opts = { similarity: 0.8 }.merge!(options)
+
+    diffs = count_diff diff(obja, objb, opts)
 
     (1 - diffs.to_f / (count_a + count_b).to_f) >= opts[:similarity]
   end
@@ -83,8 +84,8 @@ module HashDiff
   #
   # check for equality or "closeness" within given tolerance
   def self.compare_values(obj1, obj2, options = {})
-    if (options[:numeric_tolerance].is_a? Numeric) &&
-       [obj1, obj2].all? { |v| v.is_a? Numeric }
+    if options[:numeric_tolerance].is_a?(Numeric) &&
+       obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
       return (obj1 - obj2).abs <= options[:numeric_tolerance]
     end
 
@@ -105,9 +106,7 @@ module HashDiff
   #
   # check if objects are comparable
   def self.comparable?(obj1, obj2, strict = true)
-    [Array, Hash].each do |type|
-      return true if obj1.is_a?(type) && obj2.is_a?(type)
-    end
+    return true if (obj1.is_a?(Array) || obj1.is_a?(Hash)) && obj2.is_a?(obj1.class)
     return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
 
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)

@@ -20,6 +20,14 @@ describe HashDiff do
     described_class.similar?(a, b, similarity: 1).should be false
   end
 
+  it 'is able to tell similiar empty hash' do
+    described_class.similar?({}, {}, 1).should be true
+  end
+
+  it 'is able to tell similiar empty array' do
+    described_class.similar?([], [], 1).should be true
+  end
+
   it 'is able to tell similiar hash with values within tolerance' do
     a = { 'a' => 1.5, 'b' => 2.25, 'c' => 3, 'd' => 4, 'e' => 5 }
     b = { 'a' => 1.503, 'b' => 2.22, 'c' => 3, 'e' => 5 }
