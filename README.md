@@ -8,6 +8,9 @@ HashDiff does not monkey-patch any existing class. All features are contained in
 
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
+
+__WARNING__: Don't use the library for comparing large arrays, say ~10K (see #49).
+
 ## Why HashDiff?
 
 Given two Hashes A and B, sometimes you face the question: what's the smallest modification that can be made to change A into B?
@@ -262,4 +265,3 @@ HashDiff.diff(a, b) => []
 ## License
 
 HashDiff is distributed under the MIT-LICENSE.
-
