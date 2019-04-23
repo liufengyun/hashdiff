@@ -103,22 +103,7 @@ module HashDiff
 
     result = []
     if obj1.is_a?(Array) && opts[:use_lcs]
-      changeset = diff_array_lcs(obj1, obj2, opts) do |lcs|
-        # use a's index for similarity
-        lcs.each do |pair|
-          prefix = prefix_append_array_index(opts[:prefix], pair[0], opts)
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: prefix)))
-        end
-      end
-
-      changeset.each do |change|
-        change_key = prefix_append_array_index(opts[:prefix], change[1], opts)
-        if change[0] == '-'
-          result << ['-', change_key, change[2]]
-        elsif change[0] == '+'
-          result << ['+', change_key, change[2]]
-        end
-      end
+      return LcsCompareArrays.call obj1, obj2, opts
     elsif obj1.is_a?(Array) && !opts[:use_lcs]
       result.concat(LinearCompareArray.call(obj1, obj2, opts))
     elsif obj1.is_a?(Hash)
