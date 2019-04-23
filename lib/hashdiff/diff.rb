@@ -74,6 +74,8 @@ module HashDiff
   #
   # @since 0.0.1
   def self.diff(obj1, obj2, options = {}, &block)
+    return [] if !block_given? && !options[:comparison] && obj1.nil? && obj2.nil?
+
     opts = {
       prefix: '',
       similarity: 0.8,
@@ -92,8 +94,6 @@ module HashDiff
     # prefer to compare with provided block
     result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
     return result if result
-
-    return [] if obj1.nil? && obj2.nil?
 
     return [['~', opts[:prefix], nil, obj2]] if obj1.nil?
 

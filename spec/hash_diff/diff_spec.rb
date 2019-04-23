@@ -275,6 +275,14 @@ describe HashDiff do
       end
       diff.should == [['~', 'b', 'boat', 'truck'], ['~', 'c', 'plane', ' plan']]
     end
+
+    context 'when objects are nils' do
+      it 'compares using proc specified in block' do
+        diff = described_class.diff(nil, nil) { false }
+
+        expect(diff).to eq [['~', '', nil, nil]]
+      end
+    end
   end
 
   context 'when :array_path is true' do
