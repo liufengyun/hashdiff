@@ -95,26 +95,19 @@ module HashDiff
 
     return [] if obj1.nil? && obj2.nil?
 
-    return [['~', opts[:prefix], nil, obj2]] if obj1.nil?
-
-    return [['~', opts[:prefix], obj1, nil]] if obj2.nil?
+    return [['~', opts[:prefix], obj1, obj2]] if obj1.nil? || obj2.nil?
 
     return [['~', opts[:prefix], obj1, obj2]] unless comparable?(obj1, obj2, opts[:strict])
 
-    result = []
-    if obj1.is_a?(Array) && opts[:use_lcs]
-      return LcsCompareArrays.call obj1, obj2, opts
-    elsif obj1.is_a?(Array) && !opts[:use_lcs]
-      result.concat(LinearCompareArray.call(obj1, obj2, opts))
-    elsif obj1.is_a?(Hash)
-      return CompareHashes.call obj1, obj2, opts
-    else
-      return [] if compare_values(obj1, obj2, opts)
+    return LcsCompareArrays.call(obj1, obj2, opts) if obj1.is_a?(Array) && opts[:use_lcs]
 
-      return [['~', opts[:prefix], obj1, obj2]]
-    end
+    return LinearCompareArray.call(obj1, obj2, opts) if obj1.is_a?(Array) && !opts[:use_lcs]
 
-    result
+    return CompareHashes.call(obj1, obj2, opts) if obj1.is_a?(Hash)
+
+    return [] if compare_values(obj1, obj2, opts)
+
+    [['~', opts[:prefix], obj1, obj2]]
   end
 
   # @private
