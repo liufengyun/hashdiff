@@ -6,6 +6,8 @@ module HashDiff
   class CompareHashes
     class << self
       def call(obj1, obj2, opts = {})
+        return [] if obj1.empty? && obj2.empty?
+
         obj1_keys = obj1.keys
         obj2_keys = obj2.keys
 
