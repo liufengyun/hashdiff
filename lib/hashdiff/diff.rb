@@ -122,44 +122,7 @@ module HashDiff
     elsif obj1.is_a?(Array) && !opts[:use_lcs]
       result.concat(LinearCompareArray.call(obj1, obj2, opts))
     elsif obj1.is_a?(Hash)
-      obj1_keys = obj1.keys
-      obj2_keys = obj2.keys
-
-      deleted_keys = (obj1_keys - obj2_keys).sort_by(&:to_s)
-      common_keys = (obj1_keys & obj2_keys).sort_by(&:to_s)
-      added_keys = (obj2_keys - obj1_keys).sort_by(&:to_s)
-
-      # add deleted properties
-      deleted_keys.each do |k|
-        change_key = prefix_append_key(opts[:prefix], k, opts)
-        custom_result = custom_compare(opts[:comparison], change_key, obj1[k], nil)
-
-        if custom_result
-          result.concat(custom_result)
-        else
-          result << ['-', change_key, obj1[k]]
-        end
-      end
-
-      # recursive comparison for common keys
-      common_keys.each do |k|
-        prefix = prefix_append_key(opts[:prefix], k, opts)
-        result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
-      end
-
-      # added properties
-      added_keys.each do |k|
-        change_key = prefix_append_key(opts[:prefix], k, opts)
-        next if obj1.key?(k)
-
-        custom_result = custom_compare(opts[:comparison], change_key, nil, obj2[k])
-
-        if custom_result
-          result.concat(custom_result)
-        else
-          result << ['+', change_key, obj2[k]]
-        end
-      end
+      return CompareHashes.call obj1, obj2, opts
     else
       return [] if compare_values(obj1, obj2, opts)
 
