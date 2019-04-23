@@ -95,78 +95,19 @@ module HashDiff
 
     return [] if obj1.nil? && obj2.nil?
 
-    return [['~', opts[:prefix], nil, obj2]] if obj1.nil?
-
-    return [['~', opts[:prefix], obj1, nil]] if obj2.nil?
+    return [['~', opts[:prefix], obj1, obj2]] if obj1.nil? || obj2.nil?
 
     return [['~', opts[:prefix], obj1, obj2]] unless comparable?(obj1, obj2, opts[:strict])
 
-    result = []
-    if obj1.is_a?(Array) && opts[:use_lcs]
-      changeset = diff_array_lcs(obj1, obj2, opts) do |lcs|
-        # use a's index for similarity
-        lcs.each do |pair|
-          prefix = prefix_append_array_index(opts[:prefix], pair[0], opts)
-          result.concat(diff(obj1[pair[0]], obj2[pair[1]], opts.merge(prefix: prefix)))
-        end
-      end
+    return LcsCompareArrays.call(obj1, obj2, opts) if obj1.is_a?(Array) && opts[:use_lcs]
 
-      changeset.each do |change|
-        change_key = prefix_append_array_index(opts[:prefix], change[1], opts)
-        if change[0] == '-'
-          result << ['-', change_key, change[2]]
-        elsif change[0] == '+'
-          result << ['+', change_key, change[2]]
-        end
-      end
-    elsif obj1.is_a?(Array) && !opts[:use_lcs]
-      result.concat(LinearCompareArray.call(obj1, obj2, opts))
-    elsif obj1.is_a?(Hash)
-      obj1_keys = obj1.keys
-      obj2_keys = obj2.keys
+    return LinearCompareArray.call(obj1, obj2, opts) if obj1.is_a?(Array) && !opts[:use_lcs]
 
-      deleted_keys = (obj1_keys - obj2_keys).sort_by(&:to_s)
-      common_keys = (obj1_keys & obj2_keys).sort_by(&:to_s)
-      added_keys = (obj2_keys - obj1_keys).sort_by(&:to_s)
+    return CompareHashes.call(obj1, obj2, opts) if obj1.is_a?(Hash)
 
-      # add deleted properties
-      deleted_keys.each do |k|
-        change_key = prefix_append_key(opts[:prefix], k, opts)
-        custom_result = custom_compare(opts[:comparison], change_key, obj1[k], nil)
+    return [] if compare_values(obj1, obj2, opts)
 
-        if custom_result
-          result.concat(custom_result)
-        else
-          result << ['-', change_key, obj1[k]]
-        end
-      end
-
-      # recursive comparison for common keys
-      common_keys.each do |k|
-        prefix = prefix_append_key(opts[:prefix], k, opts)
-        result.concat(diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
-      end
-
-      # added properties
-      added_keys.each do |k|
-        change_key = prefix_append_key(opts[:prefix], k, opts)
-        next if obj1.key?(k)
-
-        custom_result = custom_compare(opts[:comparison], change_key, nil, obj2[k])
-
-        if custom_result
-          result.concat(custom_result)
-        else
-          result << ['+', change_key, obj2[k]]
-        end
-      end
-    else
-      return [] if compare_values(obj1, obj2, opts)
-
-      return [['~', opts[:prefix], obj1, obj2]]
-    end
-
-    result
+    [['~', opts[:prefix], obj1, obj2]]
   end
 
   # @private
