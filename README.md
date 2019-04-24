@@ -262,6 +262,11 @@ b[:b].sort!
 HashDiff.diff(a, b) => []
 ```
 
+## Maintainers
+
+- Krzysztof Rybka ([@krzysiek1507](https://github.com/krzysiek1507))
+- Fengyun Liu ([@liufengyun](https://github.com/liufengyun))
+
 ## License
 
 HashDiff is distributed under the MIT-LICENSE.
