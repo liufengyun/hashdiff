@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rubocop')
   s.add_development_dependency('rubocop-rspec')
   s.add_development_dependency('yard')
-  
+
   if s.respond_to?(:metadata)
     s.metadata = {
       'bug_tracker_uri' => 'https://github.com/liufengyun/hashdiff/issues',
