@@ -29,11 +29,11 @@ Gem::Specification.new do |s|
   
   if s.respond_to?(:metadata)
     s.metadata = {
-      "bug_tracker_uri"   => "https://github.com/liufengyun/hashdiff/issues",
-      "changelog_uri"     => "https://github.com/liufengyun/hashdiff/blob/master/changelog.md",
-      "documentation_uri" => "https://www.rubydoc.info/gems/hashdiff",
-      "homepage_uri"      => "https://github.com/liufengyun/hashdiff",
-      "source_code_uri"   => "https://github.com/liufengyun/hashdiff"
+      'bug_tracker_uri' => 'https://github.com/liufengyun/hashdiff/issues',
+      'changelog_uri' => 'https://github.com/liufengyun/hashdiff/blob/master/changelog.md',
+      'documentation_uri' => 'https://www.rubydoc.info/gems/hashdiff',
+      'homepage_uri' => 'https://github.com/liufengyun/hashdiff',
+      'source_code_uri' => 'https://github.com/liufengyun/hashdiff'
     }
   end
 end
