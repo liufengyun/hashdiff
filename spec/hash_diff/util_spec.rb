@@ -21,11 +21,11 @@ describe HashDiff do
   end
 
   it 'is able to tell similiar empty hash' do
-    described_class.similar?({}, {}, 1).should be true
+    described_class.similar?({}, {}, similarity: 1).should be true
   end
 
   it 'is able to tell similiar empty array' do
-    described_class.similar?([], [], 1).should be true
+    described_class.similar?([], [], similarity: 1).should be true
   end
 
   it 'is able to tell similiar hash with values within tolerance' do

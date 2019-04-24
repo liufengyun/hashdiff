@@ -275,6 +275,20 @@ describe HashDiff do
       end
       diff.should == [['~', 'b', 'boat', 'truck'], ['~', 'c', 'plane', ' plan']]
     end
+
+    it 'compares nested arrays using proc specified in block' do
+      a = { a: 'car', b: %w[boat plane] }
+      b = { a: 'bus', b: ['truck', ' plan'] }
+
+      diff = described_class.diff(a, b) do |path, obj1, obj2|
+        case path
+        when 'b[*]'
+          obj1.length == obj2.length
+        end
+      end
+
+      expect(diff).to eq [['~', 'a', 'car', 'bus'], ['~', 'b[1]', 'plane', ' plan'], ['-', 'b[0]', 'boat'], ['+', 'b[0]', 'truck']]
+    end
   end
 
   context 'when :array_path is true' do

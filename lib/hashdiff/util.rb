@@ -5,7 +5,7 @@ module HashDiff
   #
   # judge whether two objects are similar
   def self.similar?(obja, objb, options = {})
-    return compare_values(obja, objb, options) unless obja.is_a?(Array) || obja.is_a?(Hash) || objb.is_a?(Array) || objb.is_a?(Hash)
+    return compare_values(obja, objb, options) if !options[:comparison] && !any_hash_or_array?(obja, objb)
 
     count_a = count_nodes(obja)
     count_b = count_nodes(objb)
@@ -138,6 +138,17 @@ module HashDiff
       prefix + [array_index]
     else
       "#{prefix}[#{array_index}]"
+    end
+  end
+
+  class << self
+    private
+
+    # @private
+    #
+    # checks if both objects are Arrays or Hashes
+    def any_hash_or_array?(obja, objb)
+      obja.is_a?(Array) || obja.is_a?(Hash) || objb.is_a?(Array) || objb.is_a?(Hash)
     end
   end
 end
