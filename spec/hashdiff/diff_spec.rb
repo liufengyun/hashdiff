@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HashDiff do
+describe Hashdiff do
   it 'is able to diff two empty hashes' do
     diff = described_class.diff({}, {})
     diff.should == []

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HashDiff::LinearCompareArray do
+describe Hashdiff::LinearCompareArray do
   it 'finds no differences between two empty arrays' do
     difference = described_class.call([], [])
     difference.should == []

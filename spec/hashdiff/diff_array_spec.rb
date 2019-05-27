@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HashDiff do
+describe Hashdiff do
   it 'is able to diff two equal array' do
     a = [1, 2, 3]
     b = [1, 2, 3]

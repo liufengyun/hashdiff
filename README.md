@@ -1,17 +1,17 @@
-# HashDiff [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.svg)](http://travis-ci.org/liufengyun/hashdiff) [![Gem Version](https://badge.fury.io/rb/hashdiff.svg)](http://badge.fury.io/rb/hashdiff)
+# Hashdiff [![Build Status](https://secure.travis-ci.org/liufengyun/hashdiff.svg)](http://travis-ci.org/liufengyun/hashdiff) [![Gem Version](https://badge.fury.io/rb/hashdiff.svg)](http://badge.fury.io/rb/hashdiff)
 
-HashDiff is a ruby library to compute the smallest difference between two hashes.
+Hashdiff is a ruby library to compute the smallest difference between two hashes.
 
 It also supports comparing two arrays.
 
-HashDiff does not monkey-patch any existing class. All features are contained inside the `HashDiff` module.
+Hashdiff does not monkey-patch any existing class. All features are contained inside the `Hashdiff` module.
 
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 
 __WARNING__: Don't use the library for comparing large arrays, say ~10K (see #49).
 
-## Why HashDiff?
+## Why Hashdiff?
 
 Given two Hashes A and B, sometimes you face the question: what's the smallest modification that can be made to change A into B?
 
@@ -21,7 +21,7 @@ An algorithm that responds to this question has to do following:
 * Compute recursively -- Arrays and Hashes may be nested arbitrarily in A or B.
 * Compute the smallest change -- it should recognize similar child Hashes or child Arrays between A and B.
 
-HashDiff answers the question above using an opinionated approach:
+Hashdiff answers the question above using an opinionated approach:
 
 * Hash can be represented as a list of (dot-syntax-path, value) pairs. For example, `{a:[{c:2}]}` can be represented as `["a[0].c", 2]`.
 * The change set can be represented using the dot-syntax representation. For example, `[['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]`.
@@ -46,7 +46,7 @@ Two simple hashes:
 a = {a:3, b:2}
 b = {}
 
-diff = HashDiff.diff(a, b)
+diff = Hashdiff.diff(a, b)
 diff.should == [['-', 'a', 3], ['-', 'b', 2]]
 ```
 
@@ -56,7 +56,7 @@ More complex hashes:
 a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
 b = {a:{y:3}, b:{y:3, z:30}}
 
-diff = HashDiff.diff(a, b)
+diff = Hashdiff.diff(a, b)
 diff.should == [['-', 'a.x', 2], ['-', 'a.z', 4], ['-', 'b.x', 3], ['~', 'b.z', 45, 30], ['+', 'b.y', 3]]
 ```
 
@@ -66,7 +66,7 @@ Arrays in hashes:
 a = {a:[{x:2, y:3, z:4}, {x:11, y:22, z:33}], b:{x:3, z:45}}
 b = {a:[{y:3}, {x:11, z:33}], b:{y:22}}
 
-diff = HashDiff.best_diff(a, b)
+diff = Hashdiff.best_diff(a, b)
 diff.should == [['-', 'a[0].x', 2], ['-', 'a[0].z', 4], ['-', 'a[1].y', 22], ['-', 'b.x', 3], ['-', 'b.z', 45], ['+', 'b.y', 22]]
 ```
 
@@ -78,8 +78,8 @@ patch example:
 a = {'a' => 3}
 b = {'a' => {'a1' => 1, 'a2' => 2}}
 
-diff = HashDiff.diff(a, b)
-HashDiff.patch!(a, diff).should == b
+diff = Hashdiff.diff(a, b)
+Hashdiff.patch!(a, diff).should == b
 ```
 
 unpatch example:
@@ -88,8 +88,8 @@ unpatch example:
 a = [{'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5}, {'x' => 5, 'y' => 6, 'z' => 3}, 1]
 b = [1, {'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5}]
 
-diff = HashDiff.diff(a, b) # diff two array is OK
-HashDiff.unpatch!(b, diff).should == a
+diff = Hashdiff.diff(a, b) # diff two array is OK
+Hashdiff.unpatch!(b, diff).should == a
 ```
 
 ### Options
@@ -106,7 +106,7 @@ You can specify `:delimiter` to be something other than the default dot. For exa
 a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
 b = {a:{y:3}, b:{y:3, z:30}}
 
-diff = HashDiff.diff(a, b, :delimiter => '\t')
+diff = Hashdiff.diff(a, b, :delimiter => '\t')
 diff.should == [['-', 'a\tx', 2], ['-', 'a\tz', 4], ['-', 'b\tx', 3], ['~', 'b\tz', 45, 30], ['+', 'b\ty', 3]]
 ```
 
@@ -126,7 +126,7 @@ The :numeric_tolerance option allows for a small numeric tolerance.
 a = {x:5, y:3.75, z:7}
 b = {x:6, y:3.76, z:7}
 
-diff = HashDiff.diff(a, b, :numeric_tolerance => 0.1)
+diff = Hashdiff.diff(a, b, :numeric_tolerance => 0.1)
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -138,7 +138,7 @@ The :strip option strips all strings before comparing.
 a = {x:5, s:'foo '}
 b = {x:6, s:'foo'}
 
-diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
+diff = Hashdiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -150,7 +150,7 @@ The :case_insensitive option makes string comparisons ignore case.
 a = {x:5, s:'FooBar'}
 b = {x:6, s:'foobar'}
 
-diff = HashDiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
+diff = Hashdiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -164,7 +164,7 @@ is useful for `patch!` when used on hashes without string keys.
 a = {x:5}
 b = {'x'=>6}
 
-diff = HashDiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, :array_path => true)
 diff.should == [['-', [:x], 5], ['+', ['x'], 6]]
 ```
 
@@ -173,7 +173,7 @@ For cases where there are arrays in paths their index will be added to the path.
 a = {x:[0,1]}
 b = {x:[0,2]}
 
-diff = HashDiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, :array_path => true)
 diff.should == [["-", [:x, 1], 1], ["+", [:x, 1], 2]]
 ```
 
@@ -183,7 +183,7 @@ This shouldn't cause problems if you are comparing an array with a hash:
 a = {x:{0=>1}}
 b = {x:[1]}
 
-diff = HashDiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, :array_path => true)
 diff.should == [["~", [:x], {0=>1}, [1]]]
 ```
 
@@ -205,7 +205,7 @@ Note, currently the :similarity option has no effect when :use_lcs is false.
 a = {x: [0, 1, 2]}
 b = {x: [0, 2, 2, 3]}
 
-diff = HashDiff.diff(a, b, :use_lcs => false)
+diff = Hashdiff.diff(a, b, :use_lcs => false)
 diff.should == [["~", "x[1]", 1, 2], ["+", "x[3]", 3]]
 ```
 
@@ -217,7 +217,7 @@ It's possible to specify how the values of a key should be compared.
 a = {a:'car', b:'boat', c:'plane'}
 b = {a:'bus', b:'truck', c:' plan'}
 
-diff = HashDiff.diff(a, b) do |path, obj1, obj2|
+diff = Hashdiff.diff(a, b) do |path, obj1, obj2|
   case path
   when  /a|b|c/
     obj1.length == obj2.length
@@ -233,7 +233,7 @@ The yielded params of the comparison block is `|path, obj1, obj2|`, in which pat
 a = {a:'car', b:['boat', 'plane'] }
 b = {a:'bus', b:['truck', ' plan'] }
 
-diff = HashDiff.diff(a, b) do |path, obj1, obj2|
+diff = Hashdiff.diff(a, b) do |path, obj1, obj2|
   case path
   when 'b[*]'
     obj1.length == obj2.length
@@ -255,11 +255,11 @@ An order difference alone between two arrays can create too many diffs to be use
 a = {a:'car', b:['boat', 'plane'] }
 b = {a:'car', b:['plane', 'boat'] }
 
-HashDiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
+Hashdiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
 
 b[:b].sort!
 
-HashDiff.diff(a, b) => []
+Hashdiff.diff(a, b) => []
 ```
 
 ## Maintainers
@@ -269,4 +269,4 @@ HashDiff.diff(a, b) => []
 
 ## License
 
-HashDiff is distributed under the MIT-LICENSE.
+Hashdiff is distributed under the MIT-LICENSE.
