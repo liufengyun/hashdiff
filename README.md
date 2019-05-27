@@ -184,7 +184,7 @@ a = {x:{0=>1}}
 b = {x:[1]}
 
 diff = HashDiff.diff(a, b, :array_path => true)
-diff.should == [["~", [:a], [1], {0=>1}]]
+diff.should == [["~", [:x], {0=>1}, [1]]]
 ```
 
 #### `:use_lcs`
