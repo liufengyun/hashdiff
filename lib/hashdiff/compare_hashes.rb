@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HashDiff
+module Hashdiff
   # @private
   # Used to compare hashes
   class CompareHashes
@@ -19,8 +19,8 @@ module HashDiff
 
         # add deleted properties
         deleted_keys.each do |k|
-          change_key = HashDiff.prefix_append_key(opts[:prefix], k, opts)
-          custom_result = HashDiff.custom_compare(opts[:comparison], change_key, obj1[k], nil)
+          change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
+          custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, obj1[k], nil)
 
           if custom_result
             result.concat(custom_result)
@@ -31,16 +31,16 @@ module HashDiff
 
         # recursive comparison for common keys
         common_keys.each do |k|
-          prefix = HashDiff.prefix_append_key(opts[:prefix], k, opts)
+          prefix = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
 
-          result.concat(HashDiff.diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
+          result.concat(Hashdiff.diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
         end
 
         # added properties
         added_keys.each do |k|
-          change_key = HashDiff.prefix_append_key(opts[:prefix], k, opts)
+          change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
 
-          custom_result = HashDiff.custom_compare(opts[:comparison], change_key, nil, obj2[k])
+          custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, nil, obj2[k])
 
           if custom_result
             result.concat(custom_result)

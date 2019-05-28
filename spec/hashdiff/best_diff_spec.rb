@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HashDiff do
+describe Hashdiff do
   it 'is able to best diff' do
     a = { 'x' => [{ 'a' => 1, 'c' => 3, 'e' => 5 }, { 'y' => 3 }] }
     b = { 'x' => [{ 'a' => 1, 'b' => 2, 'e' => 5 }] }

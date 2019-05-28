@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HashDiff
+module Hashdiff
   # @private
   #
   # Used to compare arrays in a linear complexity, which produces longer diffs
@@ -80,8 +80,8 @@ module HashDiff
     end
 
     def item_difference(old_item, new_item, item_index)
-      prefix = HashDiff.prefix_append_array_index(options[:prefix], item_index, options)
-      HashDiff.diff(old_item, new_item, options.merge(prefix: prefix))
+      prefix = Hashdiff.prefix_append_array_index(options[:prefix], item_index, options)
+      Hashdiff.diff(old_item, new_item, options.merge(prefix: prefix))
     end
 
     # look ahead in the new array to see if the current item appears later
@@ -137,12 +137,12 @@ module HashDiff
     end
 
     def append_addition(item, index)
-      key = HashDiff.prefix_append_array_index(options[:prefix], index, options)
+      key = Hashdiff.prefix_append_array_index(options[:prefix], index, options)
       additions << ['+', key, item]
     end
 
     def append_deletion(item, index)
-      key = HashDiff.prefix_append_array_index(options[:prefix], index, options)
+      key = Hashdiff.prefix_append_array_index(options[:prefix], index, options)
       deletions << ['-', key, item]
     end
 

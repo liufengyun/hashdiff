@@ -22,7 +22,7 @@
 
 ## v0.3.4 2017-05-01
 
-* performance improvement of HashDiff#similar? #31
+* performance improvement of `#similar?` #31
 
 ## v0.3.2 2016-12-27
 
@@ -64,7 +64,7 @@
 ## v0.0.5 2012-7-1
 
 * fix a bug in judging whehter two objects are similiar.
-* add more spec test for HashDiff.best_diff
+* add more spec test for `.best_diff`
 
 ## v0.0.4 2012-6-24
 

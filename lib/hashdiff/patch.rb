@@ -3,7 +3,7 @@
 #
 # This module provides methods to diff two hash, patch and unpatch hash
 #
-module HashDiff
+module Hashdiff
   # Apply patch to object
   #
   # @param [Hash, Array] obj the object to be patched, can be an Array or a Hash

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HashDiff
+module Hashdiff
   # @private
   #
   # caculate array difference using LCS algorithm

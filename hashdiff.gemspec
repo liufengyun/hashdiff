@@ -5,16 +5,17 @@ require 'hashdiff/version'
 
 Gem::Specification.new do |s|
   s.name        = 'hashdiff'
-  s.version     = HashDiff::VERSION
+  s.version     = Hashdiff::VERSION
   s.license     = 'MIT'
-  s.summary     = ' HashDiff is a diff lib to compute the smallest difference between two hashes. '
-  s.description = ' HashDiff is a diff lib to compute the smallest difference between two hashes. '
+  s.summary     = ' Hashdiff is a diff lib to compute the smallest difference between two hashes. '
+  s.description = ' Hashdiff is a diff lib to compute the smallest difference between two hashes. '
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- Appraisals {spec}/*`.split("\n")
 
   s.require_paths = ['lib']
   s.required_ruby_version = Gem::Requirement.new('>= 2.0.0')
+  s.post_install_message = 'The HashDiff constant used by this gem conflicts with another gem of a similar name.  As of version 1.0 the HashDiff constant will be completely removed and replaced by Hashdiff.  For more information see https://github.com/liufengyun/hashdiff/issues/45.'
 
   s.authors = ['Liu Fengyun']
   s.email   = ['liufengyunchina@gmail.com']

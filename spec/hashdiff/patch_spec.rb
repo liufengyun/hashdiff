@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe HashDiff do
+describe Hashdiff do
   it 'is able to patch key addition' do
     a = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200 }
     b = { 'a' => 3, 'c' => 11, 'd' => 45, 'e' => 100, 'f' => 200, 'g' => 300 }
