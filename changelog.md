@@ -1,5 +1,11 @@
 # Change Log
 
+## v0.4.0 2019-05-28
+
+* refactoring (#56 #57 #59 #61 krzysiek1507)
+* fix typo in README (#64 @pboling)
+* change HashDiff to Hashdiff (#65 @jfelchner)
+
 ## v0.3.9 2019-04-22
 
 * Performance tweak (thanks @krzysiek1507: #51 #52 #53)
