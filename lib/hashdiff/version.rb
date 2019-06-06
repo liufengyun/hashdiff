@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Hashdiff
-  VERSION = '0.4.0'.freeze
+  VERSION = '1.0.0.beta1'
 end
