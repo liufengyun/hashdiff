@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
 
   s.require_paths = ['lib']
   s.required_ruby_version = Gem::Requirement.new('>= 2.0.0')
-  s.post_install_message = 'The HashDiff constant used by this gem conflicts with another gem of a similar name.  As of version 1.0 the HashDiff constant will be completely removed and replaced by Hashdiff.  For more information see https://github.com/liufengyun/hashdiff/issues/45.'
 
   s.authors = ['Liu Fengyun']
   s.email   = ['liufengyunchina@gmail.com']
