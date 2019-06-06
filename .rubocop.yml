@@ -22,5 +22,7 @@ Style/FrozenStringLiteralComment:
   EnforcedStyle: always
 Style/NumericPredicate:
   Enabled: false
+Style/RedundantFreeze:
+  Enabled: false
 RSpec/ExampleLength:
   Enabled: false
