@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.0.0.beta1 2019-06-06
+
+* fix warnings in ci (#69 @y-yagi)
+* drop warnings of the constant change (#70 @jfelchner)
+
 ## v0.4.0 2019-05-28
 
 * refactoring (#56 #57 #59 #61 krzysiek1507)
