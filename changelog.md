@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.0.0 2019-06-06
+
+* Fix typo in readme (#72 @koic)
+* Fix Rubocop offence (#73 @koic)
+* Bumps version to v1.0.0 (#74 @jfelchner)
+
 ## v1.0.0.beta1 2019-06-06
 
 * fix warnings in ci (#69 @y-yagi)
