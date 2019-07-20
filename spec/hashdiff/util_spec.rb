@@ -92,4 +92,24 @@ describe Hashdiff do
       expect(described_class.compare_values('horse', 'Horse', case_insensitive: true)).to be true
     end
   end
+
+  describe '.comparable?' do
+    it 'identifies hashes as comparable' do
+      expect(described_class.comparable?({}, {})).to be true
+    end
+
+    it 'identifies a subclass of Hash to be comparable with a Hash' do
+      OtherHash = Class.new(Hash)
+      expect(described_class.comparable?(OtherHash.new, {})).to be true
+    end
+
+    it 'identifies a Hash to be comparable with a subclass of Hash' do
+      OtherHash = Class.new(Hash)
+      expect(described_class.comparable?({}, OtherHash.new)).to be true
+    end
+
+    it 'does not identify a Numeric as comparable with a Hash' do
+      expect(described_class.comparable?(1, {})).to be false
+    end
+  end
 end
