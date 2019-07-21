@@ -16,7 +16,7 @@ module Hashdiff
 
     diffs = count_diff diff(obja, objb, opts)
 
-    (1 - diffs.to_f / (count_a + count_b).to_f) >= opts[:similarity]
+    (1 - diffs / (count_a + count_b).to_f) >= opts[:similarity]
   end
 
   # @private
