@@ -107,6 +107,7 @@ module Hashdiff
   # check if objects are comparable
   def self.comparable?(obj1, obj2, strict = true)
     return true if (obj1.is_a?(Array) || obj1.is_a?(Hash)) && obj2.is_a?(obj1.class)
+    return true if (obj2.is_a?(Array) || obj2.is_a?(Hash)) && obj1.is_a?(obj2.class)
     return true if !strict && obj1.is_a?(Numeric) && obj2.is_a?(Numeric)
 
     obj1.is_a?(obj2.class) && obj2.is_a?(obj1.class)
