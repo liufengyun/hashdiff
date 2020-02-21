@@ -68,6 +68,7 @@ describe Hashdiff do
     it 'compares different objects without tolerance' do
       expect(described_class.compare_values('hats', 'ninjas')).to be false
     end
+
     it 'compares other objects with tolerance' do
       expect(described_class.compare_values('hats', 'ninjas', numeric_tolerance: 0.01)).to be false
     end
@@ -99,13 +100,13 @@ describe Hashdiff do
     end
 
     it 'identifies a subclass of Hash to be comparable with a Hash' do
-      OtherHash = Class.new(Hash)
-      expect(described_class.comparable?(OtherHash.new, {})).to be true
+      other = Class.new(Hash)
+      expect(described_class.comparable?(other.new, {})).to be true
     end
 
     it 'identifies a Hash to be comparable with a subclass of Hash' do
-      OtherHash = Class.new(Hash)
-      expect(described_class.comparable?({}, OtherHash.new)).to be true
+      other = Class.new(Hash)
+      expect(described_class.comparable?({}, other.new)).to be true
     end
 
     it 'does not identify a Numeric as comparable with a Hash' do
