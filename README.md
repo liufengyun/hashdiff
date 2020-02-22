@@ -32,7 +32,7 @@ Hashdiff answers the question above using an opinionated approach:
 
 To use the gem, add the following to your Gemfile:
 
-```ruby
+```Ruby
 gem 'hashdiff'
 ```
 
@@ -106,7 +106,7 @@ You can specify `:delimiter` to be something other than the default dot. For exa
 a = {a:{x:2, y:3, z:4}, b:{x:3, z:45}}
 b = {a:{y:3}, b:{y:3, z:30}}
 
-diff = Hashdiff.diff(a, b, :delimiter => '\t')
+diff = Hashdiff.diff(a, b, delimiter: '\t')
 diff.should == [['-', 'a\tx', 2], ['-', 'a\tz', 4], ['-', 'b\tx', 3], ['~', 'b\tz', 45, 30], ['+', 'b\ty', 3]]
 ```
 
@@ -126,7 +126,7 @@ The :numeric_tolerance option allows for a small numeric tolerance.
 a = {x:5, y:3.75, z:7}
 b = {x:6, y:3.76, z:7}
 
-diff = Hashdiff.diff(a, b, :numeric_tolerance => 0.1)
+diff = Hashdiff.diff(a, b, numeric_tolerance: 0.1)
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -138,7 +138,7 @@ The :strip option strips all strings before comparing.
 a = {x:5, s:'foo '}
 b = {x:6, s:'foo'}
 
-diff = Hashdiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :strip => true })
+diff = Hashdiff.diff(a, b, numeric_tolerance: 0.1, strip: true)
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -150,7 +150,7 @@ The :case_insensitive option makes string comparisons ignore case.
 a = {x:5, s:'FooBar'}
 b = {x:6, s:'foobar'}
 
-diff = Hashdiff.diff(a, b, :comparison => { :numeric_tolerance => 0.1, :case_insensitive => true })
+diff = Hashdiff.diff(a, b, numeric_tolerance: 0.1, case_insensitive: true)
 diff.should == [["~", "x", 5, 6]]
 ```
 
@@ -164,7 +164,7 @@ is useful for `patch!` when used on hashes without string keys.
 a = {x:5}
 b = {'x'=>6}
 
-diff = Hashdiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, array_path: true)
 diff.should == [['-', [:x], 5], ['+', ['x'], 6]]
 ```
 
@@ -173,7 +173,7 @@ For cases where there are arrays in paths their index will be added to the path.
 a = {x:[0,1]}
 b = {x:[0,2]}
 
-diff = Hashdiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, array_path: true)
 diff.should == [["-", [:x, 1], 1], ["+", [:x, 1], 2]]
 ```
 
@@ -183,7 +183,7 @@ This shouldn't cause problems if you are comparing an array with a hash:
 a = {x:{0=>1}}
 b = {x:[1]}
 
-diff = Hashdiff.diff(a, b, :array_path => true)
+diff = Hashdiff.diff(a, b, array_path: true)
 diff.should == [["~", [:x], {0=>1}, [1]]]
 ```
 
@@ -205,7 +205,7 @@ Note, currently the :similarity option has no effect when :use_lcs is false.
 a = {x: [0, 1, 2]}
 b = {x: [0, 2, 2, 3]}
 
-diff = Hashdiff.diff(a, b, :use_lcs => false)
+diff = Hashdiff.diff(a, b, use_lcs: false)
 diff.should == [["~", "x[1]", 1, 2], ["+", "x[3]", 3]]
 ```
 
@@ -255,11 +255,11 @@ An order difference alone between two arrays can create too many diffs to be use
 a = {a:'car', b:['boat', 'plane'] }
 b = {a:'car', b:['plane', 'boat'] }
 
-Hashdiff.diff(a, b) => [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
+Hashdiff.diff(a, b).should == [["+", "b[0]", "plane"], ["-", "b[2]", "plane"]]
 
 b[:b].sort!
 
-Hashdiff.diff(a, b) => []
+Hashdiff.diff(a, b).should == []
 ```
 
 ## Maintainers

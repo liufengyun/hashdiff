@@ -1,4 +1,6 @@
 require: rubocop-rspec
+AllCops:
+  TargetRubyVersion: 2.0 # always the lowest version we support
 Metrics/PerceivedComplexity:
   Enabled: false
 Metrics/CyclomaticComplexity:
@@ -25,4 +27,6 @@ Style/NumericPredicate:
 Style/RedundantFreeze:
   Enabled: false
 RSpec/ExampleLength:
+  Enabled: false
+RSpec/DescribeClass:
   Enabled: false
