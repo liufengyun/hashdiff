@@ -7,6 +7,10 @@ module Hashdiff
     class << self
       def call(obj1, obj2, opts = {})
         return [] if obj1.empty? && obj2.empty?
+        if opts[:indifferent]
+          obj1 = obj1.with_indifferent_access
+          obj2 = obj2.with_indifferent_access
+        end
 
         obj1_keys = obj1.keys
         obj2_keys = obj2.keys
