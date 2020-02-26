@@ -50,8 +50,8 @@ describe Hashdiff do
   end
 
   it 'ignores string vs symbol differences, when indifferent is true' do
-    diff = described_class.diff({ 'a' => 2, :b => 2 }, { :a => 2, 'b' => 2 }, indifferent: true)
-    diff.should == []
+    diff = described_class.diff({ 'a' => 2, :b => 2 }, { :a => 2, 'b' => 2, :c => 3 }, indifferent: true)
+    diff.should == [["+", "c", 3]]
   end
 
   it 'is able to diff changes in hash value' do
