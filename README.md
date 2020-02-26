@@ -120,7 +120,7 @@ The `:strict` option, which defaults to `true`, specifies whether numeric types 
 
 #### `:indifferent`
 
-The `:indifferent` option, which defaults to `false`, specifies whether to treat hash keys indifferently.  Seting `:indifferent` to true has the effect of ignoring differences between symbol keys (ie. {a: 1} ~= {'a' => 1})
+The `:indifferent` option, which defaults to `false`, specifies whether to treat hash keys indifferently.  Setting `:indifferent` to true has the effect of ignoring differences between symbol keys (ie. {a: 1} ~= {'a' => 1})
 
 #### `:numeric_tolerance`
 
