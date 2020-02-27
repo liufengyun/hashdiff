@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.0.1 2020-02-25
+
+* Add indifferent option
+
 ## v1.0.0 2019-06-06
 
 * Fix typo in readme (#72 @koic)

@@ -95,8 +95,8 @@ Hashdiff.unpatch!(b, diff).should == a
 ### Options
 
 There are eight options available: `:delimiter`, `:similarity`,
-`:strict`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path`
-and `:use_lcs`
+`:strict`, `:indifferent`, `:numeric_tolerance`, `:strip`, `:case_insensitive`,
+`:array_path` and `:use_lcs`
 
 #### `:delimiter`
 
@@ -117,6 +117,10 @@ In cases where you have similar hash objects in arrays, you can pass a custom va
 #### `:strict`
 
 The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, an Integer will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
+
+#### `:indifferent`
+
+The `:indifferent` option, which defaults to `false`, specifies whether to treat hash keys indifferently.  Setting `:indifferent` to true has the effect of ignoring differences between symbol keys (ie. {a: 1} ~= {'a' => 1})
 
 #### `:numeric_tolerance`
 

@@ -10,6 +10,15 @@ module Hashdiff
 
         obj1_keys = obj1.keys
         obj2_keys = obj2.keys
+        obj1_lookup = {}
+        obj2_lookup = {}
+
+        if opts[:indifferent]
+          obj1_lookup = obj1_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
+          obj2_lookup = obj2_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
+          obj1_keys = obj1_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
+          obj2_keys = obj2_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
+        end
 
         added_keys = (obj2_keys - obj1_keys).sort_by(&:to_s)
         common_keys = (obj1_keys & obj2_keys).sort_by(&:to_s)
@@ -19,6 +28,7 @@ module Hashdiff
 
         # add deleted properties
         deleted_keys.each do |k|
+          k = opts[:indifferent] ? obj1_lookup[k] : k
           change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
           custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, obj1[k], nil)
 
@@ -33,13 +43,16 @@ module Hashdiff
         common_keys.each do |k|
           prefix = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
 
-          result.concat(Hashdiff.diff(obj1[k], obj2[k], opts.merge(prefix: prefix)))
+          k1 = opts[:indifferent] ? obj1_lookup[k] : k
+          k2 = opts[:indifferent] ? obj2_lookup[k] : k
+          result.concat(Hashdiff.diff(obj1[k1], obj2[k2], opts.merge(prefix: prefix)))
         end
 
         # added properties
         added_keys.each do |k|
           change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
 
+          k = opts[:indifferent] ? obj2_lookup[k] : k
           custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, nil, obj2[k])
 
           if custom_result
