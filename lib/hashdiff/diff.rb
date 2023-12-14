@@ -93,7 +93,7 @@ module Hashdiff
 
     opts[:prefix] = [] if opts[:array_path] && opts[:prefix] == ''
 
-    opts[:ignore_keys] = [*opts[:ignore_keys]]
+    opts[:ignore_keys] = [*opts[:ignore_keys]] # splat covers single sym/string case
 
     opts[:comparison] = block if block_given?
 

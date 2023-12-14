@@ -127,6 +127,15 @@ b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
 diff = Hashdiff.diff(a, b, ignore_keys: :a)
 diff.should == [['~', 'c', 4, 5]]
 ```
+If you wish instead to ignore keys at a particlar level you should 
+use a [custom comparison method](https://github.com/liufengyun/hashdiff#specifying-a-custom-comparison-method) instead. For example:
+
+```ruby
+a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
+b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
+diff = Hashdiff.diff(a, b) { |path, _e, _a| true if path == 'b.a' } # note '.' is the default delimiter
+diff.should == [['~', 'a', 1, 2], ['~', 'c', 4, 5]]
+``` 
 
 #### `:indifferent`
 
