@@ -1,5 +1,7 @@
 # Change Log
 
+## v1.1.0 2020-02-25
+
 * Add ignore_keys option (#86 @Matzfan)
 * Remove pinned version of rake < 11
 * Bump rspec dep ~> 3.5
