@@ -26,6 +26,8 @@ module Hashdiff
 
         result = []
 
+        opts[:ignore_keys].each { |k| common_keys.delete k }
+
         # add deleted properties
         deleted_keys.each do |k|
           k = opts[:indifferent] ? obj1_lookup[k] : k

@@ -94,9 +94,8 @@ Hashdiff.unpatch!(b, diff).should == a
 
 ### Options
 
-There are eight options available: `:delimiter`, `:similarity`,
-`:strict`, `:indifferent`, `:numeric_tolerance`, `:strip`, `:case_insensitive`,
-`:array_path` and `:use_lcs`
+The following options are available: `:delimiter`, `:similarity`, `:strict`, `:ignore_keys`,
+`:indifferent`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path` and `:use_lcs`
 
 #### `:delimiter`
 
@@ -117,6 +116,17 @@ In cases where you have similar hash objects in arrays, you can pass a custom va
 #### `:strict`
 
 The `:strict` option, which defaults to `true`, specifies whether numeric types are compared on type as well as value.  By default, an Integer will never be equal to a Float (e.g. 4 != 4.0).  Setting `:strict` to false makes the comparison looser (e.g. 4 == 4.0).
+
+#### `:ignore_keys`
+
+The `:ignore_keys` option allows you to specify one or more keys to ignore, which defaults to `[]` (none). Ignored keys are ignored at all levels. For example:
+
+```ruby
+a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
+b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
+diff = Hashdiff.diff(a, b, ignore_keys: :a)
+diff.should == [['~', 'c', 4, 5]]
+```
 
 #### `:indifferent`
 

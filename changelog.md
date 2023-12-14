@@ -1,5 +1,11 @@
 # Change Log
 
+* Add ignore_keys option (#86 @Matzfan)
+* Remove pinned version of rake < 11
+* Bump rspec dep ~> 3.5
+* Bump rubocop dep >= 1.52.1
+* Bump rubocop-rspec dep > 1.16.0
+
 ## v1.0.1 2020-02-25
 
 * Add indifferent option

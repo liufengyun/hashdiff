@@ -17,16 +17,24 @@ Metrics/BlockLength:
   Enabled: false
 Metrics/ModuleLength:
   Enabled: false
+Style/CaseLikeIf:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
+Style/OptionalBooleanParameter:
+  Enabled: false
 Style/NumericPredicate:
   Enabled: false
 Style/RedundantFreeze:
   Enabled: false
+Style/RedundantReturn:
+  Enabled: false
 RSpec/ExampleLength:
   Enabled: false
 RSpec/DescribeClass:
+  Enabled: false
+RSpec/FilePath:
   Enabled: false

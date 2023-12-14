@@ -49,6 +49,21 @@ describe Hashdiff do
     diff.should == []
   end
 
+  context 'with the ignore_keys option' do
+    a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
+    b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
+
+    it 'ignores a single key' do
+      diff = described_class.diff(a, b, ignore_keys: :a)
+      diff.should == [['~', 'c', 4, 5]]
+    end
+
+    it 'ignores an array of keys' do
+      diff = described_class.diff(a, b, ignore_keys: %i[a c])
+      diff.should == []
+    end
+  end
+
   it 'ignores string vs symbol differences, when indifferent is true' do
     diff = described_class.diff({ 'a' => 2, :b => 2 }, { :a => 2, 'b' => 2, :c => 3 }, indifferent: true)
     diff.should == [['+', 'c', 3]]
