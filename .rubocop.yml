@@ -36,5 +36,7 @@ RSpec/ExampleLength:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
-RSpec/FilePath:
+RSpec/SpecFilePathFormat:
+  Enabled: false
+RSpec/NoExpectationExample:
   Enabled: false
