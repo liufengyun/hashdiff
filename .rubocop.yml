@@ -9,7 +9,7 @@ Metrics/MethodLength:
   Enabled: false
 Metrics/AbcSize:
   Enabled: false
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 Metrics/ClassLength:
   Enabled: false
@@ -36,5 +36,7 @@ RSpec/ExampleLength:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
-RSpec/FilePath:
+RSpec/SpecFilePathFormat:
+  Enabled: false
+RSpec/NoExpectationExample:
   Enabled: false
