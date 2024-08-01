@@ -1,5 +1,7 @@
 # Change Log
 
+* Fix bug in ignore_keys option #88
+
 ## v1.1.0 2023-12-14
 
 * Add ignore_keys option (#86 @Matzfan)

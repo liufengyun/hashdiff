@@ -50,17 +50,37 @@ describe Hashdiff do
   end
 
   context 'with the ignore_keys option' do
-    a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
-    b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
+    a = { a: 4, g: 0, b: { a: 5, c: 6, e: 1 }       }
+    b = {             b: { a: 7, c: 3, f: 1 }, d: 8 }
 
-    it 'ignores a single key' do
-      diff = described_class.diff(a, b, ignore_keys: :a)
-      diff.should == [['~', 'c', 4, 5]]
+    it 'ignores a single key at first level' do
+      diff = described_class.diff(a, b, ignore_keys: :d)
+      diff.should == [['-', 'a', 4], ['-', 'g', 0], ['-', 'b.e', 1], ['~', 'b.a', 5, 7], ['~', 'b.c', 6, 3], ['+', 'b.f', 1]]
     end
 
-    it 'ignores an array of keys' do
-      diff = described_class.diff(a, b, ignore_keys: %i[a c])
-      diff.should == []
+    it 'ignores a single key in nested hash' do
+      diff = described_class.diff(a, b, ignore_keys: :e)
+      diff.should == [['-', 'a', 4], ['-', 'g', 0], ['~', 'b.a', 5, 7], ['~', 'b.c', 6, 3], ['+', 'b.f', 1], ['+', 'd', 8]]
+    end
+
+    it 'ignores a single key at all levels' do
+      diff = described_class.diff(a, b, ignore_keys: :a)
+      diff.should == [['-', 'g', 0], ['-', 'b.e', 1], ['~', 'b.c', 6, 3], ['+', 'b.f', 1], ['+', 'd', 8]]
+    end
+
+    it 'ignores an array of keys at first level' do
+      diff = described_class.diff(a, b, ignore_keys: %i[g b])
+      diff.should == [['-', 'a', 4], ['+', 'd', 8]]
+    end
+
+    it 'ignores an array of keys in nested hash' do
+      diff = described_class.diff(a, b, ignore_keys: %i[c e])
+      diff.should == [['-', 'a', 4], ['-', 'g', 0], ['~', 'b.a', 5, 7], ['+', 'b.f', 1], ['+', 'd', 8]]
+    end
+
+    it 'ignores an array of keys at all levels' do
+      diff = described_class.diff(a, b, ignore_keys: %i[a f])
+      diff.should == [['-', 'g', 0], ['-', 'b.e', 1], ['~', 'b.c', 6, 3], ['+', 'd', 8]]
     end
   end
 

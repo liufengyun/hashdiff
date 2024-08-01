@@ -119,22 +119,25 @@ The `:strict` option, which defaults to `true`, specifies whether numeric types 
 
 #### `:ignore_keys`
 
-The `:ignore_keys` option allows you to specify one or more keys to ignore, which defaults to `[]` (none). Ignored keys are ignored at all levels. For example:
+The `:ignore_keys` option allows you to specify one or more keys to ignore, which defaults to `[]` (none). Ignored keys are ignored at all levels in both hashes. For example:
 
 ```ruby
-a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
-b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
-diff = Hashdiff.diff(a, b, ignore_keys: :a)
-diff.should == [['~', 'c', 4, 5]]
+a = { a: 4, g: 0, b: { a: 5, c: 6, e: 1 }       }
+b = {             b: { a: 7, c: 3, f: 1 }, d: 8 }
+diff = Hashdiff.diff(a, b, ignore_keys: %i[a f])
+diff.should == [['-', 'g', 0], ['-', 'b.e', 1], ['~', 'b.c', 6, 3], ['+', 'd', 8]]
 ```
 If you wish instead to ignore keys at a particlar level you should 
-use a [custom comparison method](https://github.com/liufengyun/hashdiff#specifying-a-custom-comparison-method) instead. For example:
+use a [custom comparison method](https://github.com/liufengyun/hashdiff#specifying-a-custom-comparison-method) instead. For example to diff only at the 2nd level of both hashes:
 
 ```ruby
-a = { a: 1, b: { d: 2, a: 3 }, c: 4 }
-b = { a: 2, b: { d: 2, a: 7 }, c: 5 }
-diff = Hashdiff.diff(a, b) { |path, _e, _a| true if path == 'b.a' } # note '.' is the default delimiter
-diff.should == [['~', 'a', 1, 2], ['~', 'c', 4, 5]]
+a = { a: 4, g: 0, b: { a: 5, c: 6, e: 1 }       }
+b = {             b: { a: 7, c: 3, f: 1 }, d: 8 }
+diff = Hashdiff.diff(a, b) do |path, _e, _a|
+  arr = path.split('.')
+  true if %w[a f].include?(arr.last) && arr.size == 2 # note '.' is the default delimiter
+end
+diff.should == [['-', 'a', 4], ['-', 'g', 0], ['-', 'b.e', 1], ['~', 'b.c', 6, 3], ['+', 'd', 8]]
 ``` 
 
 #### `:indifferent`
