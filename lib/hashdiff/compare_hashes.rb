@@ -26,7 +26,11 @@ module Hashdiff
 
         result = []
 
-        opts[:ignore_keys].each { |k| common_keys.delete k }
+        opts[:ignore_keys].each do |k|
+          added_keys.delete k
+          common_keys.delete k
+          deleted_keys.delete k
+        end
 
         # add deleted properties
         deleted_keys.each do |k|
