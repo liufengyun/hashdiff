@@ -1,6 +1,9 @@
 # Change Log
 
-* Fix bug in ignore_keys option #88
+## v1.1.1 2024-08-02
+
+* Fix bug in ignore_keys option #88 (@Matzfan)
+* Exclude spec files from gem package #94 (@amatsuda)
 
 ## v1.1.0 2023-12-14
 
