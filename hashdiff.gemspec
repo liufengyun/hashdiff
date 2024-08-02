@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.summary     = ' Hashdiff is a diff lib to compute the smallest difference between two hashes. '
   s.description = ' Hashdiff is a diff lib to compute the smallest difference between two hashes. '
 
-  s.files         = `git ls-files`.split("\n")
+  s.files         = `git ls-files`.split("\n").grep_v(%r{^spec/})
   s.test_files    = `git ls-files -- Appraisals {spec}/*`.split("\n")
 
   s.require_paths = ['lib']
