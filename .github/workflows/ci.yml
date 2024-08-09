@@ -22,7 +22,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-      - name: Install dependencies
-        run: bundle install --jobs $(nproc) --retry 3
+          bundler-cache: true # 'bundle install' and cache gems
       - name: Run rake
         run: bundle exec rake
