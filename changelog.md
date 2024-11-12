@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.1.2 2024-11-12
+
+* Fix bundler cache #96 (@olleolleolle)
+* Quote the '3.0' in YAML #95 (@olleolleolle)
+* Fix version in source code #97 (@liufengyun)
+
 ## v1.1.1 2024-08-02
 
 * Fix bug in ignore_keys option #88 (@Matzfan)
