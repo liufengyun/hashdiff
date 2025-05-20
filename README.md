@@ -95,7 +95,8 @@ Hashdiff.unpatch!(b, diff).should == a
 ### Options
 
 The following options are available: `:delimiter`, `:similarity`, `:strict`, `:ignore_keys`,
-`:indifferent`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path` and `:use_lcs`
+`:indifferent`, `:numeric_tolerance`, `:strip`, `:case_insensitive`, `:array_path`, 
+`:use_lcs`, and `:preserve_key_order`
 
 #### `:delimiter`
 
@@ -233,6 +234,30 @@ b = {x: [0, 2, 2, 3]}
 
 diff = Hashdiff.diff(a, b, use_lcs: false)
 diff.should == [["~", "x[1]", 1, 2], ["+", "x[3]", 3]]
+```
+
+#### `:preserve_key_order`
+
+By default, the change set is ordered by operation type: deletions (-) first, then updates (~), and finally additions (+). 
+Within each operation group, keys are sorted alphabetically:
+
+```ruby
+a = {d: 1, c: 1,       a: 1}
+b = {d: 2,       b: 2, a: 2}
+
+diff = Hashdiff.diff(a, b)
+diff.should == [["-", "c", 1], ["~", "a", 1, 2], ["~", "d", 1, 2], ["+", "b", 2]]
+```
+
+Setting :preserve_key_order to true processes keys in the order they appear in the first hash.
+Keys that only exist in the second hash are appended in their original order:
+
+```ruby
+a = {d: 1, c: 1,       a: 1}
+b = {d: 2,       b: 2, a: 2}
+
+diff = Hashdiff.diff(a, b, preserve_key_order: true)
+diff.should == [["~", "d", 1, 2], ["-", "c", 1], ["~", "a", 1, 2], ["+", "b", 2]]
 ```
 
 #### Specifying a custom comparison method

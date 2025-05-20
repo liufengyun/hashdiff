@@ -392,4 +392,44 @@ describe Hashdiff do
       diff.should == [['~', 'a[0][0]', 0, 1], ['~', 'a[0][1]', 1, 2]]
     end
   end
+
+  context 'when :preserve_key_order is nil or false' do
+    # rubocop:disable Layout/ExtraSpacing
+    it 'sorts hash changes by operation type (-, ~, +), then alphabetically by key' do
+      a = { 'f' => 1,           'd' => 1, 'c' => 1,           'a' => 1 }
+      b = {           'e' => 2, 'd' => 2,           'b' => 2, 'a' => 2 }
+
+      diff = described_class.diff(a, b)
+      expect(diff).to eq([['-', 'c', 1], ['-', 'f', 1], ['~', 'a', 1, 2], ['~', 'd', 1, 2], ['+', 'b', 2], ['+', 'e', 2]])
+    end
+
+    it 'sorts changes at each level of a nested hash by operation type, then alphabetically by key' do
+      a = { 'y' => { 'c' => 1, 'b' => 1, 'a' => 1 }, 'x' => {           'b' => 1           } }
+      b = { 'y' => {           'b' => 2           }, 'x' => { 'c' => 2, 'b' => 2, 'a' => 2 } }
+
+      diff = described_class.diff(a, b)
+      expect(diff).to eq([['~', 'x.b', 1, 2], ['+', 'x.a', 2], ['+', 'x.c', 2], ['-', 'y.a', 1], ['-', 'y.c', 1], ['~', 'y.b', 1, 2]])
+    end
+    # rubocop:enable Layout/ExtraSpacing
+  end
+
+  context 'when :preserve_key_order is true' do
+    # rubocop:disable Layout/ExtraSpacing
+    it 'preserves the key order from the first hash and appends new keys from the second hash in their original order' do
+      a = { 'f' => 1,           'd' => 1, 'c' => 1,           'a' => 1 }
+      b = {           'e' => 2, 'd' => 2,           'b' => 2, 'a' => 2 }
+
+      diff = described_class.diff(a, b, preserve_key_order: true)
+      expect(diff).to eq([['-', 'f', 1], ['~', 'd', 1, 2], ['-', 'c', 1], ['~', 'a', 1, 2], ['+', 'e', 2], ['+', 'b', 2]])
+    end
+
+    it 'preserves the key order at each level of a nested hash and appends new keys from the second hash in their original order' do
+      a = { 'y' => { 'c' => 1, 'b' => 1, 'a' => 1 }, 'x' => {           'b' => 1           } }
+      b = { 'y' => {           'b' => 2           }, 'x' => { 'c' => 2, 'b' => 2, 'a' => 2 } }
+
+      diff = described_class.diff(a, b, preserve_key_order: true)
+      expect(diff).to eq([['-', 'y.c', 1], ['~', 'y.b', 1, 2], ['-', 'y.a', 1], ['~', 'x.b', 1, 2], ['+', 'x.c', 2], ['+', 'x.a', 2]])
+    end
+    # rubocop:enable Layout/ExtraSpacing
+  end
 end
