@@ -20,9 +20,9 @@ module Hashdiff
           obj2_keys = obj2_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
         end
 
-        added_keys = (obj2_keys - obj1_keys).sort_by(&:to_s)
-        common_keys = (obj1_keys & obj2_keys).sort_by(&:to_s)
-        deleted_keys = (obj1_keys - obj2_keys).sort_by(&:to_s)
+        added_keys = obj2_keys - obj1_keys
+        common_keys = obj1_keys & obj2_keys
+        deleted_keys = obj1_keys - obj2_keys
 
         result = []
 
@@ -32,40 +32,67 @@ module Hashdiff
           deleted_keys.delete k
         end
 
-        # add deleted properties
-        deleted_keys.each do |k|
-          k = opts[:indifferent] ? obj1_lookup[k] : k
-          change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
-          custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, obj1[k], nil)
+        handle_key = lambda do |k, type|
+          case type
+          when :deleted
+            # add deleted properties
+            k = opts[:indifferent] ? obj1_lookup[k] : k
+            change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
+            custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, obj1[k], nil)
 
-          if custom_result
-            result.concat(custom_result)
+            if custom_result
+              result.concat(custom_result)
+            else
+              result << ['-', change_key, obj1[k]]
+            end
+          when :common
+            # recursive comparison for common keys
+            prefix = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
+
+            k1 = opts[:indifferent] ? obj1_lookup[k] : k
+            k2 = opts[:indifferent] ? obj2_lookup[k] : k
+            result.concat(Hashdiff.diff(obj1[k1], obj2[k2], opts.merge(prefix: prefix)))
+          when :added
+            # added properties
+            change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
+
+            k = opts[:indifferent] ? obj2_lookup[k] : k
+            custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, nil, obj2[k])
+
+            if custom_result
+              result.concat(custom_result)
+            else
+              result << ['+', change_key, obj2[k]]
+            end
           else
-            result << ['-', change_key, obj1[k]]
+            raise "Invalid type: #{type}"
           end
         end
 
-        # recursive comparison for common keys
-        common_keys.each do |k|
-          prefix = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
+        if opts[:preserve_key_order]
+          added_keys_lookup = added_keys.each_with_object({}) { |k, h| h[k] = true }
+          common_keys_lookup = common_keys.each_with_object({}) { |k, h| h[k] = true }
+          deleted_keys_lookup = deleted_keys.each_with_object({}) { |k, h| h[k] = true }
 
-          k1 = opts[:indifferent] ? obj1_lookup[k] : k
-          k2 = opts[:indifferent] ? obj2_lookup[k] : k
-          result.concat(Hashdiff.diff(obj1[k1], obj2[k2], opts.merge(prefix: prefix)))
-        end
-
-        # added properties
-        added_keys.each do |k|
-          change_key = Hashdiff.prefix_append_key(opts[:prefix], k, opts)
-
-          k = opts[:indifferent] ? obj2_lookup[k] : k
-          custom_result = Hashdiff.custom_compare(opts[:comparison], change_key, nil, obj2[k])
-
-          if custom_result
-            result.concat(custom_result)
-          else
-            result << ['+', change_key, obj2[k]]
+          # Keys are processed in the order they appeared in obj1. Keys that only exist in obj2 will be appended
+          # afterward in their obj2 order.
+          (obj1_keys + obj2_keys).uniq.each do |k|
+            if added_keys_lookup[k]
+              handle_key.call(k, :added)
+            elsif common_keys_lookup[k]
+              handle_key.call(k, :common)
+            elsif deleted_keys_lookup[k]
+              handle_key.call(k, :deleted)
+            else
+              # key has been pruned (e.g. from opts[:ignore_keys])
+            end
           end
+        else
+          # Keys are first grouped by operation type (deletions first, then changes, then additions), and then sorted
+          # alphabetically within each group.
+          deleted_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :deleted) }
+          common_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :common) }
+          added_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :added) }
         end
 
         result

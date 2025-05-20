@@ -16,6 +16,7 @@ module Hashdiff
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #   * :array_path (Boolean) [false] whether to return the path references for nested values in an array, can be used for patch compatibility with non string keys.
   #   * :use_lcs (Boolean) [true] whether or not to use an implementation of the Longest common subsequence algorithm for comparing arrays, produces better diffs but is slower.
+  #   * :preserve_key_order (Boolean) [false] If false, operations are grouped by type (-, ~, then +) then by hash key alphabetically. If true, preserves the original key order from the first hash and appends new keys from the second hash in order.
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
   #
@@ -62,6 +63,7 @@ module Hashdiff
   #   * :strip (Boolean) [false] whether or not to call #strip on strings before comparing
   #   * :array_path (Boolean) [false] whether to return the path references for nested values in an array, can be used for patch compatibility with non string keys.
   #   * :use_lcs (Boolean) [true] whether or not to use an implementation of the Longest common subsequence algorithm for comparing arrays, produces better diffs but is slower.
+  #   * :preserve_key_order (Boolean) [false] If false, operations are grouped by type (-, ~, then +) then by hash key alphabetically. If true, preserves the original key order from the first hash and appends new keys from the second hash in order.
   #
   #
   # @yield [path, value1, value2] Optional block is used to compare each value, instead of default #==. If the block returns value other than true of false, then other specified comparison options will be used to do the comparison.
@@ -88,7 +90,8 @@ module Hashdiff
       strip: false,
       numeric_tolerance: 0,
       array_path: false,
-      use_lcs: true
+      use_lcs: true,
+      preserve_key_order: false
     }.merge!(options)
 
     opts[:prefix] = [] if opts[:array_path] && opts[:prefix] == ''
