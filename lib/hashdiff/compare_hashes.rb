@@ -70,12 +70,13 @@ module Hashdiff
         end
 
         if opts[:preserve_key_order]
+          # Building lookups to speed up key classification
           added_keys_lookup = added_keys.each_with_object({}) { |k, h| h[k] = true }
           common_keys_lookup = common_keys.each_with_object({}) { |k, h| h[k] = true }
           deleted_keys_lookup = deleted_keys.each_with_object({}) { |k, h| h[k] = true }
 
-          # Keys are processed in the order they appeared in obj1. Keys that only exist in obj2 will be appended
-          # afterward in their obj2 order.
+          # Iterate through all keys, preserving obj1's key order and appending any new keys from obj2. Shared keys
+          # (found in both obj1 and obj2) follow obj1's order since uniq only keeps the first occurrence.
           (obj1_keys + obj2_keys).uniq.each do |k|
             if added_keys_lookup[k]
               handle_key.call(k, :added)
@@ -83,8 +84,6 @@ module Hashdiff
               handle_key.call(k, :common)
             elsif deleted_keys_lookup[k]
               handle_key.call(k, :deleted)
-            else
-              # key has been pruned (e.g. from opts[:ignore_keys])
             end
           end
         else
