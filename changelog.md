@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.2.0 2025-5-20
+
+* Added :preserve_key_order option to maintain original hash key order #99 (@robkiessling)
+
 ## v1.1.2 2024-11-12
 
 * Fix bundler cache #96 (@olleolleolle)
