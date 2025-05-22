@@ -59,7 +59,8 @@ module Hashdiff
     path.split(delimiter).inject([]) do |memo, part|
       if part =~ /^(.*)\[(\d+)\]$/
         if !Regexp.last_match(1).empty?
-          memo + [Regexp.last_match(1), Regexp.last_match(2).to_i]
+          inner_decode = self.decode_property_path(Regexp.last_match(1), delimiter)
+          memo + [*inner_decode, Regexp.last_match(2).to_i]
         else
           memo + [Regexp.last_match(2).to_i]
         end

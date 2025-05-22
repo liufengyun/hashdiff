@@ -113,4 +113,14 @@ describe Hashdiff do
       expect(described_class.comparable?(1, {})).to be false
     end
   end
+
+  describe '.decode_property_path' do
+    it 'decodes according to doc' do
+      expect(described_class.decode_property_path('a.b[3].c')).to eq(['a', 'b', 3, 'c'])
+    end
+
+    it 'decodes nested array' do
+      expect(described_class.decode_property_path('a[1][2]')).to eq(['a', 1, 2])
+    end
+  end
 end
