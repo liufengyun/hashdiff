@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.2.1 2025-09-06
+
+* Use HTTPS for the source in the Gemfile #101 (@krzysiek1507)
+
 ## v1.2.0 2025-5-20
 
 * Added :preserve_key_order option to maintain original hash key order #99 (@robkiessling)
