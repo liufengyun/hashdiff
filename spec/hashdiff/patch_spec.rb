@@ -182,4 +182,28 @@ describe Hashdiff do
     b = { 'a' => 5, :a => 6, 0 => 7 }
     described_class.unpatch!(b, diff).should == a
   end
+
+  it 'is able to patch a use_lcs: false diff that removes array items in several places' do
+    a = { 'a' => %w[a b c d e f] }
+    b = { 'a' => %w[b d x e] }
+    diff = described_class.diff(a, b, use_lcs: false)
+
+    expect(described_class.patch!(a, diff)).to eq(b)
+
+    a = { 'a' => %w[a b c d e f] }
+    b = { 'a' => %w[b d x e] }
+    described_class.unpatch!(b, diff).should == a
+  end
+
+  it 'is able to patch a use_lcs: false diff that shortens an array holding nils' do
+    a = { 'a' => [nil, 'a', nil, 'a', nil] }
+    b = { 'a' => %w[a a a] }
+    diff = described_class.diff(a, b, use_lcs: false)
+
+    expect(described_class.patch!(a, diff)).to eq(b)
+
+    a = { 'a' => [nil, 'a', nil, 'a', nil] }
+    b = { 'a' => %w[a a a] }
+    described_class.unpatch!(b, diff).should == a
+  end
 end
