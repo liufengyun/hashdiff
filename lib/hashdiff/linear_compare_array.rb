@@ -72,7 +72,7 @@ module Hashdiff
       return if difference.empty?
 
       index_after_additions = index_of_match_after_additions
-      append_addititions_before_match(index_after_additions)
+      append_additions_before_match(index_after_additions)
 
       index_after_deletions = index_of_match_after_deletions
       append_deletions_before_match(index_after_deletions)
@@ -123,7 +123,7 @@ module Hashdiff
       nil
     end
 
-    def append_addititions_before_match(match_index)
+    def append_additions_before_match(match_index)
       return unless match_index
 
       (new_index...match_index).each { |i| append_addition(new_array[i], i) }
