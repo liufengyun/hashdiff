@@ -73,4 +73,43 @@ describe Hashdiff do
     lcs = described_class.lcs(a, b, similarity: 0.5)
     lcs.should == [[0, 0], [1, 2]]
   end
+
+  it 'compares arrays that differ in one place in linear time' do
+    a = [true, false] * 10
+    b = a.dup
+    b[a.size / 2] = nil
+
+    calls = 0
+    comparison = lambda do |_prefix, obj1, obj2|
+      calls += 1
+      obj1 == obj2
+    end
+
+    described_class.lcs(a, b, comparison: comparison)
+    calls.should be <= 2 * a.size
+  end
+
+  it 'pairs the common prefix and suffix around a change' do
+    a = [1, 2, 3, 4, 5]
+    b = [1, 2, 9, 4, 5]
+
+    lcs = described_class.lcs(a, b)
+    lcs.should == [[0, 0], [1, 1], [3, 3], [4, 4]]
+  end
+
+  it 'pairs a common first item with a later copy in the second array' do
+    a = %w[x w]
+    b = %w[x x z]
+
+    lcs = described_class.lcs(a, b)
+    lcs.should == [[0, 1]]
+  end
+
+  it 'pairs a common first item with a later copy in the first array' do
+    a = %w[x x y]
+    b = %w[x]
+
+    lcs = described_class.lcs(a, b)
+    lcs.should == [[1, 0]]
+  end
 end
