@@ -16,9 +16,6 @@ module Hashdiff
 
       self.old_index = 0
       self.new_index = 0
-      # by comparing the array lengths we can expect that a number of items
-      # are either added or removed
-      self.expected_additions = new_array.length - old_array.length
 
       loop do
         if extra_items_in_old_array?
@@ -40,7 +37,7 @@ module Hashdiff
     private
 
     attr_reader :old_array, :new_array, :options, :additions, :deletions, :differences
-    attr_accessor :old_index, :new_index, :expected_additions
+    attr_accessor :old_index, :new_index
 
     def initialize(old_array, new_array, options)
       @old_array = old_array
@@ -60,6 +57,12 @@ module Hashdiff
       new_index < new_array.length && old_index >= old_array.length
     end
 
+    # by comparing the lengths of what is left of each array we can expect
+    # that a number of items are either added or removed
+    def expected_additions
+      (new_array.length - new_index) - (old_array.length - old_index)
+    end
+
     def iterated_through_both_arrays?
       old_index >= old_array.length && new_index >= new_array.length
     end
@@ -69,7 +72,7 @@ module Hashdiff
       return if difference.empty?
 
       index_after_additions = index_of_match_after_additions
-      append_addititions_before_match(index_after_additions)
+      append_additions_before_match(index_after_additions)
 
       index_after_deletions = index_of_match_after_deletions
       append_deletions_before_match(index_after_deletions)
@@ -120,11 +123,10 @@ module Hashdiff
       nil
     end
 
-    def append_addititions_before_match(match_index)
+    def append_additions_before_match(match_index)
       return unless match_index
 
       (new_index...match_index).each { |i| append_addition(new_array[i], i) }
-      self.expected_additions = expected_additions - (match_index - new_index)
       self.new_index = match_index
     end
 
@@ -132,7 +134,6 @@ module Hashdiff
       return unless match_index
 
       (old_index...match_index).each { |i| append_deletion(old_array[i], i) }
-      self.expected_additions = expected_additions + (match_index - new_index)
       self.old_index = match_index
     end
 
