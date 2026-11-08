@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.2.2 2026-11-08
+
+* Fix array diffs with `use_lcs: false` so that `patch!` can replay them correctly [#102](https://github.com/liufengyun/hashdiff/pull/102) ([@oboxodo](https://github.com/oboxodo))
+* Reduce LCS memory use and improve performance for equal arrays and arrays with common leading or trailing items [#103](https://github.com/liufengyun/hashdiff/pull/103) ([@oboxodo](https://github.com/oboxodo))
+
 ## v1.2.1 2025-09-06
 
 * Use HTTPS for the source in the Gemfile [#101](https://github.com/liufengyun/hashdiff/issues/101) ([@krzysiek1507](https://github.com/krzysiek1507))
