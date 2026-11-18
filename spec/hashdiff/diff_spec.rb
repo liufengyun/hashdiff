@@ -54,6 +54,11 @@ describe Hashdiff do
     diff.should == []
   end
 
+  it 'shows an integer and a float of the same value in arrays as changed' do
+    diff = described_class.diff([1], [1.0])
+    diff.should == [['~', '[0]', 1, 1.0]]
+  end
+
   context 'with the ignore_keys option' do
     a = { a: 4, g: 0, b: { a: 5, c: 6, e: 1 }       }
     b = {             b: { a: 7, c: 3, f: 1 }, d: 8 }
@@ -92,6 +97,11 @@ describe Hashdiff do
   it 'ignores string vs symbol differences, when indifferent is true' do
     diff = described_class.diff({ 'a' => 2, :b => 2 }, { :a => 2, 'b' => 2, :c => 3 }, indifferent: true)
     diff.should == [['+', 'c', 3]]
+  end
+
+  it 'shows a key removed from a hash with mixed key types, when indifferent is true' do
+    diff = described_class.diff({ 'a' => 1, :b => 2 }, { 'a' => 1 }, indifferent: true)
+    diff.should == [['-', 'b', 2]]
   end
 
   it 'is able to diff changes in hash value' do
@@ -202,6 +212,21 @@ describe Hashdiff do
     diff.should == [['-', '[0].d', 4], ['-', '[1]', { 'x' => 5, 'y' => 6, 'z' => 3 }]]
   end
 
+  it 'is able to diff similar arrays in array' do
+    diff = described_class.diff([[1, 2, 3, 4, 5]], [[1, 2, 3, 4, 6]])
+    diff.should == [['-', '[0][4]', 5], ['+', '[0][4]', 6]]
+  end
+
+  it 'replaces an array in an array with one that is not similar enough' do
+    diff = described_class.diff([[1, 2, 3, 4, 5]], [[1, 2, 3, 7, 6]])
+    diff.should == [['-', '[0]', [1, 2, 3, 4, 5]], ['+', '[0]', [1, 2, 3, 7, 6]]]
+  end
+
+  it 'is able to diff similar hashes that hold arrays in array' do
+    diff = described_class.diff([{ 'a' => [1, 2] }], [{ 'a' => [1, 2], 'b' => 1 }])
+    diff.should == [['+', '[0].b', 1]]
+  end
+
   it 'uses custom delimiter when provided' do
     a = [{ 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5 }, { 'x' => 5, 'y' => 6, 'z' => 3 }, 3]
     b = [{ 'a' => 1, 'b' => 2, 'c' => 3, 'e' => 5 }, 3]
@@ -253,6 +278,11 @@ describe Hashdiff do
       diff = described_class.diff(a, b, strip: true)
       diff.should == [['-', 'b[0]', 'fizz buzz'], ['+', 'b[0]', 'fizzbuzz']]
     end
+
+    it 'is able to diff arrays that mix strings and numbers' do
+      diff = described_class.diff([1, 'a'], ['a', 1], strip: true)
+      diff.should == [['+', '[0]', 'a'], ['-', '[2]', 'a']]
+    end
   end
 
   context 'when :case_insensitive requested' do
@@ -268,6 +298,11 @@ describe Hashdiff do
       b = { 'a' => { 'x' => 'foo' }, 'b' => %w[fizzbuzz nerf] }
       diff = described_class.diff(a, b, case_insensitive: true)
       diff.should == [['-', 'b[0]', 'fizz buzz'], ['+', 'b[0]', 'fizzbuzz']]
+    end
+
+    it 'is able to diff arrays that mix strings and numbers' do
+      diff = described_class.diff([1, 'a'], ['a', 1], case_insensitive: true)
+      diff.should == [['+', '[0]', 'a'], ['-', '[2]', 'a']]
     end
   end
 
@@ -397,6 +432,11 @@ describe Hashdiff do
     it 'shows a nil item added after the items in common' do
       diff = described_class.diff(['a'], ['a', nil, 'b'])
       diff.should == [['+', '[1]', nil], ['+', '[2]', 'b']]
+    end
+
+    it 'is able to diff arrays that have a nil item in common' do
+      diff = described_class.diff([nil, 'a'], [nil, 'b'])
+      diff.should == [['-', '[1]', 'a'], ['+', '[1]', 'b']]
     end
 
     it 'shows items added at both ends of equal items' do
