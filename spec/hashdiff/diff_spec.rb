@@ -8,6 +8,11 @@ describe Hashdiff do
     diff.should == []
   end
 
+  it 'is able to diff two empty arrays' do
+    diff = described_class.diff([], [])
+    diff.should == []
+  end
+
   it 'is able to diff an hash with an empty hash' do
     a = { 'a' => 3, 'b' => 2 }
     b = {}
@@ -227,6 +232,11 @@ describe Hashdiff do
       diff = described_class.diff(b, a, numeric_tolerance: 0.01)
       diff.should == [['~', 'a.x', 0.6, 0.4], ['-', 'b[0]', 14], ['+', 'b[0]', 13]]
     end
+
+    it 'shows the first of two numbers within the tolerance as the added one' do
+      diff = described_class.diff([1.1], [1.1, 1.2], numeric_tolerance: 0.15)
+      diff.should == [['+', '[0]', 1.1]]
+    end
   end
 
   context 'when :strip requested' do
@@ -329,6 +339,17 @@ describe Hashdiff do
 
       expect(diff).to eq [['~', 'a', 'car', 'bus'], ['~', 'b[1]', 'plane', ' plan'], ['-', 'b[0]', 'boat'], ['+', 'b[0]', 'truck']]
     end
+
+    it 'yields the item of the first array before the item of the second' do
+      diff = described_class.diff([1, 3], [2]) do |path, obj1, obj2|
+        case path
+        when '[*]'
+          obj1 < obj2
+        end
+      end
+
+      diff.should == [['~', '[0]', 1, 2], ['-', '[1]', 3]]
+    end
   end
 
   context 'when :array_path is true' do
@@ -364,6 +385,53 @@ describe Hashdiff do
 
       diff = described_class.diff(x, y, array_path: true)
       diff.should == [['-', [time], 'foo'], ['+', [0], 'bar']]
+    end
+  end
+
+  context 'when arrays have equal items or nothing in common' do
+    it 'shows the first of two equal items as the removed one' do
+      diff = described_class.diff(%w[a a], %w[a])
+      diff.should == [['-', '[0]', 'a']]
+    end
+
+    it 'shows a nil item added after the items in common' do
+      diff = described_class.diff(['a'], ['a', nil, 'b'])
+      diff.should == [['+', '[1]', nil], ['+', '[2]', 'b']]
+    end
+
+    it 'shows items added at both ends of equal items' do
+      diff = described_class.diff(%w[a a], %w[b a a b])
+      diff.should == [['+', '[0]', 'b'], ['+', '[3]', 'b']]
+    end
+
+    it 'keeps the first of two items when only one of them can be kept' do
+      diff = described_class.diff(%w[a b], %w[b b a])
+      diff.should == [['+', '[0]', 'b'], ['+', '[1]', 'b'], ['-', '[3]', 'b']]
+    end
+
+    it 'keeps the last of the equal items of the second array' do
+      diff = described_class.diff(%w[a a b], %w[b b c])
+      diff.should == [['-', '[1]', 'a'], ['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[2]', 'c']]
+    end
+
+    it 'shows items moved from the end to the start as added and removed' do
+      diff = described_class.diff(%w[a a a b b], %w[b a a a])
+      diff.should == [['+', '[0]', 'b'], ['-', '[5]', 'b'], ['-', '[4]', 'b']]
+    end
+
+    it 'is able to diff an array with a longer one that has nothing in common' do
+      diff = described_class.diff(%w[a], %w[b b b b])
+      diff.should == [['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[1]', 'b'], ['+', '[2]', 'b'], ['+', '[3]', 'b']]
+    end
+
+    it 'is able to diff an array with a shorter one that has nothing in common' do
+      diff = described_class.diff(%w[a a a], %w[b b])
+      diff.should == [['-', '[2]', 'a'], ['-', '[1]', 'a'], ['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[1]', 'b']]
+    end
+
+    it 'is able to diff arrays that have more than one longest common subsequence' do
+      diff = described_class.diff(%w[a b c a b b a], %w[c b a b a c])
+      diff.should == [['-', '[0]', 'a'], ['+', '[0]', 'c'], ['-', '[2]', 'c'], ['-', '[3]', 'b'], ['+', '[5]', 'c']]
     end
   end
 
