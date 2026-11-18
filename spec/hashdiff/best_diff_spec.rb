@@ -72,4 +72,37 @@ describe Hashdiff do
     diff = described_class.best_diff(a, b, array_path: true)
     diff.should == [['-', ['x', 0, 'c'], 3], ['+', ['x', 0, 'b'], 2], ['-', ['x', 1], { 'y' => 3 }]]
   end
+
+  it 'pairs a hash with the more similar of two hashes' do
+    a = [{ 'a' => 1, 'b' => 2 }]
+    b = [{ 'a' => 1, 'b' => 2, 'c' => 3 }, { 'a' => 1 }]
+
+    diff = described_class.best_diff(a, b)
+    diff.should == [['+', '[0].c', 3], ['+', '[1]', { 'a' => 1 }]]
+  end
+
+  it 'pairs a hash with a loosely similar one rather than one that shares no value' do
+    a = [{ 'a' => 1, 'b' => 3 }]
+    b = [{ 'a' => 1, 'b' => 2, 'c' => 3 }, { 'a' => 2 }]
+
+    diff = described_class.best_diff(a, b)
+    diff.should == [['~', '[0].b', 3, 2], ['+', '[0].c', 3], ['+', '[1]', { 'a' => 2 }]]
+  end
+
+  # A changed value counts as two changes, so pairing with either hash changes four.
+  it 'pairs a hash with the more similar of two hashes when both diffs change as many values' do
+    a = [{ 'a' => 1, 'b' => 3 }]
+    b = [{ 'a' => 1 }, { 'a' => 1, 'b' => 2, 'c' => 3 }]
+
+    diff = described_class.best_diff(a, b)
+    diff.should == [['-', '[0].b', 3], ['+', '[1]', { 'a' => 1, 'b' => 2, 'c' => 3 }]]
+  end
+
+  it 'pairs a hash with an equal one rather than a similar one' do
+    a = [{ 'a' => 1 }]
+    b = [{ 'a' => 1 }, { 'a' => 1, 'b' => 2 }]
+
+    diff = described_class.best_diff(a, b)
+    diff.should == [['+', '[1]', { 'a' => 1, 'b' => 2 }]]
+  end
 end
