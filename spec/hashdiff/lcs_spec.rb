@@ -89,6 +89,52 @@ describe Hashdiff do
     calls.should be <= 2 * a.size
   end
 
+  it 'compares arrays that differ in several places in linear time' do
+    a = (1..100).to_a
+    b = a.dup
+    b.delete_at(10)
+    b.insert(50, -1)
+    b[90] = -2
+
+    calls = 0
+    comparison = lambda do |_prefix, obj1, obj2|
+      calls += 1
+      obj1 == obj2
+    end
+
+    described_class.lcs(a, b, comparison: comparison)
+    calls.should be <= 2 * a.size
+  end
+
+  it 'makes only two comparisons more than there are items when one item changed' do
+    a = (1..20).to_a
+    b = a.dup
+    b[10] = -1
+
+    calls = 0
+    comparison = lambda do |_prefix, obj1, obj2|
+      calls += 1
+      obj1 == obj2
+    end
+
+    described_class.lcs(a, b, comparison: comparison)
+    calls.should be <= a.size + 2
+  end
+
+  it 'does not compare the same items over and over when the arrays have nothing in common' do
+    a = (1..10).to_a
+    b = (11..20).to_a
+
+    calls = 0
+    comparison = lambda do |_prefix, obj1, obj2|
+      calls += 1
+      obj1 == obj2
+    end
+
+    described_class.lcs(a, b, comparison: comparison)
+    calls.should be <= (a.size * b.size) + a.size + b.size
+  end
+
   it 'pairs the common prefix and suffix around a change' do
     a = [1, 2, 3, 4, 5]
     b = [1, 2, 9, 4, 5]
