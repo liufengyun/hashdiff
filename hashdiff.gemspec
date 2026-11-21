@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
 
   s.homepage = 'https://github.com/liufengyun/hashdiff'
 
-  s.add_development_dependency('bluecloth')
   s.add_development_dependency('rspec', '~> 3.5')
   s.add_development_dependency('rubocop', '>= 1.52.1') # earliest version that works with Ruby 3.3
   s.add_development_dependency('rubocop-rspec', '> 1.16.0') # https://github.com/rubocop/rubocop-rspec/issues/461
