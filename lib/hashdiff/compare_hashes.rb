@@ -90,9 +90,14 @@ module Hashdiff
         else
           # Keys are first grouped by operation type (deletions first, then changes, then additions), and then sorted
           # alphabetically within each group.
-          deleted_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :deleted) }
-          common_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :common) }
-          added_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :added) }
+          deleted_keys.sort_by!(&:to_s)
+          deleted_keys.each { |k| handle_key.call(k, :deleted) }
+
+          common_keys.sort_by!(&:to_s)
+          common_keys.each { |k| handle_key.call(k, :common) }
+
+          added_keys.sort_by!(&:to_s)
+          added_keys.each { |k| handle_key.call(k, :added) }
         end
 
         result
