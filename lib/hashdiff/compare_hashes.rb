@@ -17,8 +17,8 @@ module Hashdiff
         if opts[:indifferent]
           obj1_lookup = obj1_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
           obj2_lookup = obj2_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
-          obj1_keys = obj1_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
-          obj2_keys = obj2_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
+          obj1_keys.map!(&:to_s)
+          obj2_keys.map!(&:to_s)
         end
 
         added_keys = obj2_keys - obj1_keys
