@@ -1,5 +1,14 @@
 # Change Log
 
+## v1.3.0 2026-11-22
+
+* Find LCS pairs with Myers' algorithm instead of an n × m table, making diffs of large, mostly similar arrays much faster and lighter on memory; diff output is unchanged [#105](https://github.com/liufengyun/hashdiff/pull/105) ([@oboxodo](https://github.com/oboxodo))
+* Speed up diffs of equal arrays and hashes, and of hashes without a custom comparison [#109](https://github.com/liufengyun/hashdiff/pull/109) [#110](https://github.com/liufengyun/hashdiff/pull/110) [#111](https://github.com/liufengyun/hashdiff/pull/111) ([@krzysiek1507](https://github.com/krzysiek1507))
+* Add specs for array diffs with more than one valid answer [#106](https://github.com/liufengyun/hashdiff/pull/106) ([@oboxodo](https://github.com/oboxodo))
+* Add Ruby 3.4 and 4.0 to CI [#108](https://github.com/liufengyun/hashdiff/pull/108) ([@krzysiek1507](https://github.com/krzysiek1507))
+* Remove the unused `bluecloth` dependency [#107](https://github.com/liufengyun/hashdiff/pull/107) ([@krzysiek1507](https://github.com/krzysiek1507))
+* Delete the unused `.travis.yml` [#104](https://github.com/liufengyun/hashdiff/pull/104) ([@olleolleolle](https://github.com/olleolleolle))
+
 ## v1.2.2 2026-11-08
 
 * Fix array diffs with `use_lcs: false` so that `patch!` can replay them correctly [#102](https://github.com/liufengyun/hashdiff/pull/102) ([@oboxodo](https://github.com/oboxodo))
