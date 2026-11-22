@@ -214,12 +214,12 @@ describe Hashdiff do
 
   it 'is able to diff similar arrays in array' do
     diff = described_class.diff([[1, 2, 3, 4, 5]], [[1, 2, 3, 4, 6]])
-    diff.should == [['-', '[0][4]', 5], ['+', '[0][4]', 6]]
+    diff.should == [['~', '[0][4]', 5, 6]]
   end
 
   it 'replaces an array in an array with one that is not similar enough' do
     diff = described_class.diff([[1, 2, 3, 4, 5]], [[1, 2, 3, 7, 6]])
-    diff.should == [['-', '[0]', [1, 2, 3, 4, 5]], ['+', '[0]', [1, 2, 3, 7, 6]]]
+    diff.should == [['~', '[0]', [1, 2, 3, 4, 5], [1, 2, 3, 7, 6]]]
   end
 
   it 'is able to diff similar hashes that hold arrays in array' do
@@ -252,10 +252,10 @@ describe Hashdiff do
       b = { 'a' => { 'x' => 0.6, 'y' => 0.341 }, 'b' => [14, 68.025] }
 
       diff = described_class.diff(a, b, numeric_tolerance: 0.01)
-      expect(diff).to eq([['~', 'a.x', 0.4, 0.6], ['-', 'b[0]', 13], ['+', 'b[0]', 14]])
+      expect(diff).to eq([['~', 'a.x', 0.4, 0.6], ['~', 'b[0]', 13, 14]])
 
       diff = described_class.diff(b, a, numeric_tolerance: 0.01)
-      diff.should == [['~', 'a.x', 0.6, 0.4], ['-', 'b[0]', 14], ['+', 'b[0]', 13]]
+      diff.should == [['~', 'a.x', 0.6, 0.4], ['~', 'b[0]', 14, 13]]
     end
 
     it 'shows the first of two numbers within the tolerance as the added one' do
@@ -276,7 +276,7 @@ describe Hashdiff do
       a = { 'a' => { 'x' => ' foo' }, 'b' => ['fizz buzz', 'nerf'] }
       b = { 'a' => { 'x' => 'foo' }, 'b' => %w[fizzbuzz nerf] }
       diff = described_class.diff(a, b, strip: true)
-      diff.should == [['-', 'b[0]', 'fizz buzz'], ['+', 'b[0]', 'fizzbuzz']]
+      diff.should == [['~', 'b[0]', 'fizz buzz', 'fizzbuzz']]
     end
 
     it 'is able to diff arrays that mix strings and numbers' do
@@ -297,7 +297,7 @@ describe Hashdiff do
       a = { 'a' => { 'x' => 'Foo' }, 'b' => ['fizz buzz', 'nerf'] }
       b = { 'a' => { 'x' => 'foo' }, 'b' => %w[fizzbuzz nerf] }
       diff = described_class.diff(a, b, case_insensitive: true)
-      diff.should == [['-', 'b[0]', 'fizz buzz'], ['+', 'b[0]', 'fizzbuzz']]
+      diff.should == [['~', 'b[0]', 'fizz buzz', 'fizzbuzz']]
     end
 
     it 'is able to diff arrays that mix strings and numbers' do
@@ -372,7 +372,7 @@ describe Hashdiff do
         end
       end
 
-      expect(diff).to eq [['~', 'a', 'car', 'bus'], ['~', 'b[1]', 'plane', ' plan'], ['-', 'b[0]', 'boat'], ['+', 'b[0]', 'truck']]
+      expect(diff).to eq [['~', 'a', 'car', 'bus'], ['~', 'b[1]', 'plane', ' plan'], ['~', 'b[0]', 'boat', 'truck']]
     end
 
     it 'yields the item of the first array before the item of the second' do
@@ -436,7 +436,7 @@ describe Hashdiff do
 
     it 'is able to diff arrays that have a nil item in common' do
       diff = described_class.diff([nil, 'a'], [nil, 'b'])
-      diff.should == [['-', '[1]', 'a'], ['+', '[1]', 'b']]
+      diff.should == [['~', '[1]', 'a', 'b']]
     end
 
     it 'shows items added at both ends of equal items' do
@@ -451,7 +451,7 @@ describe Hashdiff do
 
     it 'keeps the last of the equal items of the second array' do
       diff = described_class.diff(%w[a a b], %w[b b c])
-      diff.should == [['-', '[1]', 'a'], ['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[2]', 'c']]
+      diff.should == [['-', '[1]', 'a'], ['~', '[0]', 'a', 'b'], ['+', '[2]', 'c']]
     end
 
     it 'shows items moved from the end to the start as added and removed' do
@@ -461,17 +461,17 @@ describe Hashdiff do
 
     it 'is able to diff an array with a longer one that has nothing in common' do
       diff = described_class.diff(%w[a], %w[b b b b])
-      diff.should == [['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[1]', 'b'], ['+', '[2]', 'b'], ['+', '[3]', 'b']]
+      diff.should == [['~', '[0]', 'a', 'b'], ['+', '[1]', 'b'], ['+', '[2]', 'b'], ['+', '[3]', 'b']]
     end
 
     it 'is able to diff an array with a shorter one that has nothing in common' do
       diff = described_class.diff(%w[a a a], %w[b b])
-      diff.should == [['-', '[2]', 'a'], ['-', '[1]', 'a'], ['-', '[0]', 'a'], ['+', '[0]', 'b'], ['+', '[1]', 'b']]
+      diff.should == [['-', '[2]', 'a'], ['~', '[1]', 'a', 'b'], ['~', '[0]', 'a', 'b']]
     end
 
     it 'is able to diff arrays that have more than one longest common subsequence' do
       diff = described_class.diff(%w[a b c a b b a], %w[c b a b a c])
-      diff.should == [['-', '[0]', 'a'], ['+', '[0]', 'c'], ['-', '[2]', 'c'], ['-', '[3]', 'b'], ['+', '[5]', 'c']]
+      diff.should == [['~', '[0]', 'a', 'c'], ['-', '[2]', 'c'], ['-', '[3]', 'b'], ['+', '[5]', 'c']]
     end
   end
 

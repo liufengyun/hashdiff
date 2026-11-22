@@ -57,4 +57,16 @@ describe Hashdiff do
     diff = described_class.diff_array_lcs(a, b)
     diff.should == [['+', 0, 1], ['-', 2, 3]]
   end
+
+  it 'reports replacements in equal-length unmatched array sections' do
+    diff = described_class.diff(%w[a b c], %w[a b d])
+
+    diff.should == [['~', '[2]', 'c', 'd']]
+  end
+
+  it 'preserves additions and deletions when unmatched array sections have different lengths' do
+    diff = described_class.diff(%w[a b c], %w[a x b c])
+
+    diff.should == [['+', '[1]', 'x']]
+  end
 end

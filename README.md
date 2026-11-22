@@ -201,7 +201,7 @@ a = {x:[0,1]}
 b = {x:[0,2]}
 
 diff = Hashdiff.diff(a, b, array_path: true)
-diff.should == [["-", [:x, 1], 1], ["+", [:x, 1], 2]]
+diff.should == [["~", [:x, 1], 1, 2]]
 ```
 
 This shouldn't cause problems if you are comparing an array with a hash:
@@ -291,7 +291,7 @@ diff = Hashdiff.diff(a, b) do |path, obj1, obj2|
   end
 end
 
-diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["-", "b[0]", "boat"], ["+", "b[0]", "truck"]]
+diff.should == [["~", "a", "car", "bus"], ["~", "b[1]", "plane", " plan"], ["~", "b[0]", "boat", "truck"]]
 ```
 
 When a comparison block is given, it'll be given priority over other specified options. If the block returns value other than `true` or `false`, then the two values will be compared with other specified options.
