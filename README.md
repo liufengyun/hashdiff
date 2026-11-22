@@ -313,6 +313,12 @@ b[:b].sort!
 Hashdiff.diff(a, b).should == []
 ```
 
+## Credits
+
+The array diff finds common items with [Myers' diff algorithm](https://doi.org/10.1007/BF01840446),
+introduced in Hashdiff 1.3.0 by Diego Algorta ([@oboxodo](https://github.com/oboxodo))
+in [#105](https://github.com/liufengyun/hashdiff/pull/105).
+
 ## Maintainers
 
 - Krzysztof Rybka ([@krzysiek1507](https://github.com/krzysiek1507))
