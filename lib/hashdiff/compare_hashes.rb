@@ -7,6 +7,7 @@ module Hashdiff
     class << self
       def call(obj1, obj2, opts = {})
         return [] if obj1.empty? && obj2.empty?
+        return [] if !opts[:comparison] && obj1 == obj2
 
         obj1_keys = obj1.keys
         obj2_keys = obj2.keys
@@ -16,8 +17,8 @@ module Hashdiff
         if opts[:indifferent]
           obj1_lookup = obj1_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
           obj2_lookup = obj2_keys.each_with_object({}) { |k, h| h[k.to_s] = k }
-          obj1_keys = obj1_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
-          obj2_keys = obj2_keys.map { |k| k.is_a?(Symbol) ? k.to_s : k }
+          obj1_keys.map!(&:to_s)
+          obj2_keys.map!(&:to_s)
         end
 
         added_keys = obj2_keys - obj1_keys
@@ -89,9 +90,14 @@ module Hashdiff
         else
           # Keys are first grouped by operation type (deletions first, then changes, then additions), and then sorted
           # alphabetically within each group.
-          deleted_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :deleted) }
-          common_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :common) }
-          added_keys.sort_by(&:to_s).each { |k| handle_key.call(k, :added) }
+          deleted_keys.sort_by!(&:to_s)
+          deleted_keys.each { |k| handle_key.call(k, :deleted) }
+
+          common_keys.sort_by!(&:to_s)
+          common_keys.each { |k| handle_key.call(k, :common) }
+
+          added_keys.sort_by!(&:to_s)
+          added_keys.each { |k| handle_key.call(k, :added) }
         end
 
         result
