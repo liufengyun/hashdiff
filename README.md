@@ -9,7 +9,7 @@ Hashdiff does not monkey-patch any existing class. All features are contained in
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 
-__WARNING__: Comparing large arrays, say ~10K items, that have little in common is slow and takes a lot of memory (see #49). Large arrays that differ in a few places are fine.
+__WARNING__: Comparing large arrays, say ~10K items, that have little in common is slow and takes a lot of memory (see [#49](https://github.com/liufengyun/hashdiff/issues/49)). Large arrays that differ in a few places are fine ([#105](https://github.com/liufengyun/hashdiff/pull/105)).
 
 ## Why Hashdiff?
 
@@ -312,6 +312,12 @@ b[:b].sort!
 
 Hashdiff.diff(a, b).should == []
 ```
+
+## Credits
+
+The array diff finds common items with [Myers' diff algorithm](https://doi.org/10.1007/BF01840446),
+introduced in Hashdiff 1.3.0 by Diego Algorta ([@oboxodo](https://github.com/oboxodo))
+in [#105](https://github.com/liufengyun/hashdiff/pull/105).
 
 ## Maintainers
 
