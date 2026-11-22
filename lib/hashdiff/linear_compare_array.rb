@@ -13,6 +13,7 @@ module Hashdiff
 
     def call
       return [] if old_array.empty? && new_array.empty?
+      return [] if old_array == new_array
 
       self.old_index = 0
       self.new_index = 0
