@@ -100,9 +100,11 @@ module Hashdiff
 
     opts[:comparison] = block if block_given?
 
-    # prefer to compare with provided block
-    result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
-    return result if result
+    if opts[:comparison]
+      # prefer to compare with provided block
+      result = custom_compare(opts[:comparison], opts[:prefix], obj1, obj2)
+      return result if result
+    end
 
     return [] if obj1.nil? && obj2.nil?
 
