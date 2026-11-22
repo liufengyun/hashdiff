@@ -9,7 +9,7 @@ Hashdiff does not monkey-patch any existing class. All features are contained in
 **Docs**: [Documentation](http://rubydoc.info/gems/hashdiff)
 
 
-__WARNING__: Don't use the library for comparing large arrays, say ~10K (see #49).
+__WARNING__: Comparing large arrays, say ~10K items, that have little in common is slow and takes a lot of memory (see #49). Large arrays that differ in a few places are fine.
 
 ## Why Hashdiff?
 
