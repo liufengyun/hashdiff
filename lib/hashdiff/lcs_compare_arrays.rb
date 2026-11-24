@@ -25,7 +25,41 @@ module Hashdiff
           result << [change[0], change_key, change[2]]
         end
 
-        result
+        combine_replacements(result)
+      end
+
+      private
+
+      # LCS identifies items that remain in the array. A removal and an
+      # addition at the same index therefore represent a replacement.
+      def combine_replacements(changes)
+        additions = {}
+        changes.each_with_index do |change, index|
+          additions[change[1]] = index if change[0] == '+'
+        end
+
+        replacements = {}
+        changes.each_with_index do |change, index|
+          replacements[index] = additions[change[1]] if change[0] == '-' && additions.key?(change[1])
+        end
+
+        replaced_additions = replacements.each_value.each_with_object({}) do |index, additions_to_skip|
+          additions_to_skip[index] = true
+        end
+
+        combined = []
+        changes.each_with_index do |change, index|
+          if (replacement_index = replacements[index])
+            replacement = changes[replacement_index]
+            combined << ['~', change[1], change[2], replacement[2]]
+          elsif replaced_additions.key?(index)
+            next
+          else
+            combined << change
+          end
+        end
+
+        combined
       end
     end
   end
